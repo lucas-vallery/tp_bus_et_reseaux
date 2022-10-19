@@ -24,6 +24,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "BMP280.h"
 #include <stdio.h>
 /* USER CODE END Includes */
 
@@ -97,7 +98,21 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
+	 uint8_t id = BMP280_getId();
+	 printf("id : 0x%x\r\n", id);
 
+	 uint8_t bmp280_config = BMP280_config();
+	 printf("config : 0x%x\r\n", bmp280_config);
+
+	 uint32_t temp = BMP280_readRawTemp();
+	 printf("Temp : 0x%x\r\n", temp);
+
+	 uint32_t press = BMP280_readRawPress();
+	 printf("Press : 0x%x\r\n", press);
+
+	 printf("\rn");
+
+	 HAL_Delay(1000);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
