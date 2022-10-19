@@ -1,0 +1,16 @@
+!SESSION 2022-10-19 08:23:48.792 -----------------------------------------------
+eclipse.buildId=Version 1.10.1
+java.version=11.0.14.1
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=macosx, ARCH=x86_64, WS=cocoa, NL=fr_FR
+Framework arguments:  -keyring /Users/jean-francoiscastellani/.eclipse_keyring
+Command-line arguments:  -os macosx -ws cocoa -arch x86_64 -keyring /Users/jean-francoiscastellani/.eclipse_keyring
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2022-10-19 08:24:23.328
+!MESSAGE Log4j initialized with config file /Users/jean-francoiscastellani/Documents/GitHub/tp_bus_et_reseaux/stm32_project_bus_et _reseaux/.metadata/.log4j.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2022-10-19 08:24:27.371
+!MESSAGE Started RMI Server, listening on port 41337
+
+!ENTRY org.eclipse.equinox.p2.repository 2 0 2022-10-19 08:24:58.142
+!MESSAGE Using unsafe http transport to retrieve http://download.eclipse.org/egit/updates/content.xml.xz, see CVE-2021-41033. Consider using https instead.
