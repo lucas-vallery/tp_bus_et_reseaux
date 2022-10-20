@@ -35,6 +35,17 @@ uint8_t BMP280_config(){
 	return ctrl_meas_rx_value;
 }
 
+uint8_t BMP280_Etalonnage(uint8_t* calibration){
+	uint8_t etalonnage_register = (uint8_t)CALIB_START;
+	for (int i = 0; i<26; i++){
+		if(HAL_OK == HAL_I2C_Master_Transmit(&hi2c1, BMP_I2C_ADD, &etalonnage_register, 1, HAL_MAX_DELAY)){
+			if(HAL_OK == HAL_I2C_Master_Receive(&hi2c1, BMP_I2C_ADD, &calibration, 26, HAL_MAX_DELAY)){
+
+			}
+		}
+	}
+}
+
 uint32_t BMP280_readRawTemp(){
 	uint8_t temp_msb_register = (uint8_t)TEMP_MSB;
 	uint8_t temp_frame_rx[3];
@@ -61,4 +72,9 @@ uint32_t BMP280_readRawPress(){
 
 	uint32_t rawPress = (press_frame_rx[0]<<12) + (press_frame_rx[1]<<4) + (press_frame_rx[2]>>4);
 	return rawPress;
+}
+
+
+uint32_t BMP280_compensateTemp(){
+
 }
