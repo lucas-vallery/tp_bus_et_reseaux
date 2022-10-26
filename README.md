@@ -1,4 +1,17 @@
-# tp_bus_et_reseaux
+# Tp bus et réseaux – Castellani Vallery
+
+## TP1 : Bus I²C
+### Introduction 
+Dans ce premier TP nous cherchons à mettre en place une communication I²C entre entre le microcontrôleur et deux composants I²C. Le microncontrôleur STM32 joue le rôle de maître sur le bus.
+
+### Capteur BMP280
+La capteur BMP20 est un capteur de température est de pression. Ces deux grandeurs sont mesurées par deux composants I²C distincts.
+
+### 
+
+
+
+#TP3
 
 ### Réponse d'une requette GET
 ```
