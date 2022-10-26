@@ -1,6 +1,19 @@
 # tp_bus_et_reseaux
 
-#Réponse d'une requette post 
+### Réponse d'une requette GET
+```
+ "args": {},
+  "headers": {
+    "Accept": "*/*",
+    "Host": "192.168.88.239:5000",
+    "User-Agent": "curl/7.74.0"
+  },
+  "method": "GET",
+  "path": null,
+  "url": "http://192.168.88.239:5000/api/request"
+```
+
+### Réponse d'une requette post 
 ```
 "POST": {
     "data": {
