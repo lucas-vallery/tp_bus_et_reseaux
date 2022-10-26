@@ -1,7 +1,8 @@
 # tp_bus_et_reseaux
 
 #Réponse d'une requette post 
-```"POST": {
+```
+"POST": {
     "data": {
       "Name": "Lucas"
     }
@@ -16,6 +17,7 @@
   },
   "method": "POST",
   "path": null,
-  "url": "http://192.168.88.239:5000/api/request"```
+  "url": "http://192.168.88.239:5000/api/request"
+  ```
   
  
