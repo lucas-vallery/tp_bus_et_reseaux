@@ -3,7 +3,7 @@
 ## Table des matières
 
 - [Introduction](#introduction)
-- [TP1 - Bus I²C](#TP1---bus-i2c)
+- [TP1 - Bus I2C](#TP1---bus-i2c)
 - [TP2 - Interfaçage STM32 - Raspberry](#TP2---interfacage-STM32---raspberry)
 - [TP3 - Interface REST](#TP3---interface-REST)
 - [TP4 - Bus CAN](#TP4---Bus-CAN)
@@ -12,7 +12,7 @@
 
 ## Introduction
 
-## TP1 - Bus I²C
+## TP1 - Bus I2C
 
 Dans ce premier TP nous cherchons à mettre en place une communication I²C entre entre le microcontrôleur et deux composants I²C. Le microncontrôleur STM32 joue le rôle de maître sur le bus.
 
