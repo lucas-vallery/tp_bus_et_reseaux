@@ -226,15 +226,11 @@ Nous avons implémenté l'API CRUD suivante :
 | Delete | DELETE | welcome/ | Delete sentence |
 
 ```python
-@app.route('/api/welcome/<int:index>', methods=['GET'])
-def api_welcome_index(index):
-        if index > len(welcome):
-                abort(404)
-        else:
-                return jsonify({"index": index, "val": welcome[index]})
+@app.route('/api/welcome/', methods=['GET'])
+def api_welcome():
+        return welcome
 ```
-
-Cette fonction nous permet de retourner la lettre à la position index du mot welcome sous le format JSON. Si cet index est supérieur à la longueur du mot, on renvoie sur une page signalant une erreur 404.
+On retourne ici la chaîne de caractères en totalité.
 
 ```python
 @app.route('/api/welcome/<int:index>', methods=['GET'])
@@ -244,6 +240,8 @@ def api_welcome_index(index):
         else:
                 return jsonify({"index": index, "val": welcome[index]})
 ```
+
+Cette fonction nous permet de retourner la lettre à la position index du mot welcome sous le format JSON. Si cet index est supérieur à la longueur du mot, on renvoie sur une page signalant une erreur 404.
 
 ### Réponse d'une requette GET
 ```
