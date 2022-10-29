@@ -211,6 +211,21 @@ Durant ce TP, nous avons travaillé sur la chaîne de caractères suivante :
 ```python
 welcome = "Welcome to 3ESE API!"
 ```
+### API CRUD
+
+Nous avons implémenté l'API CRUD suivante : 
+
+| __CRUD__ | __Method__ | __Path__ | __Action__ |
+| --- | --- | --- | --- |
+| Create | POST | welcome/ | Change sentence |
+| Retrieve | GET | welcome/ | Return sentence |
+| Retrieve | GET | welcome/x | Return letter x |
+| Update | PUT | welcome/x | Insert new word at position x |
+| Update | PATCH | welcome/x | Change letter at position x |
+| Delete | DELETE | welcome/x | Delete letter at position x |
+| Delete | DELETE | welcome/ | Delete sentence |
+
+
 
 ### Réponse d'une requette GET
 ```
