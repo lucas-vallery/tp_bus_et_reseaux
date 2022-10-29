@@ -73,7 +73,7 @@ uint8_t BMP280_config(){
 Pour configurer le BMP280, on envoie deux octets. Le premier contenant l'adresse du registre à modifier ici CTRL_MEAS et le second la valeur que l'on veut écrire. On créé un tableau de 2 éléments prenant ces deux paramètres et on les envoie à l'aide de la fonction HAL.<br/>
 On a de plus ajouté la possibilité pour l'utilisateur de contrôler si la valeur a bien été écrite en la retournant.
 
-__3.Récupération de l'étalonnage, de la température et de la pression__
+__3.Récupération de l'étalonnage__
 
 ```c
 uint8_t BMP280_Etalonnage(uint8_t* calibration){
@@ -88,7 +88,119 @@ uint8_t BMP280_Etalonnage(uint8_t* calibration){
 	return 0;
 }
 ```
+Avec cette fonction on récupère les données d'étalonnage du capteur BMP280. Ces données vont nous permettre de calculer la température et la pression compensées. On reçoit les 26 octets de l'étalonnage. Ceci n'est utile qu'ici car pas tout les octets ne servent pour calculer la température ou la pression.<br/>
 
+__4.Récupération de la température compensée__
+
+Voici ci-dessous les deux fonctions nous permettant d'obtenir une valeur de température compensée : 
+
+```c
+float BMP280_readRawTemp(){
+	uint8_t temp_msb_register = (uint8_t)TEMP_MSB;
+	uint8_t temp_frame_rx[3];
+
+	if(HAL_OK == HAL_I2C_Master_Transmit(&hi2c1, BMP_I2C_ADD, &temp_msb_register, 1, HAL_MAX_DELAY)){
+		if(HAL_OK == HAL_I2C_Master_Receive(&hi2c1, BMP_I2C_ADD, temp_frame_rx, 3, HAL_MAX_DELAY)){
+
+		}
+	}
+
+	uint32_t rawTemp = (temp_frame_rx[0]<<12) + (temp_frame_rx[1]<<4) + (temp_frame_rx[2]>>4);
+
+	uint8_t tempArray[6] = {0};
+	temp_msb_register = (uint8_t)CALIB_TEMP_START;
+
+	if(HAL_OK == HAL_I2C_Master_Transmit(&hi2c1, BMP_I2C_ADD, &temp_msb_register, 1, HAL_MAX_DELAY)){
+		if(HAL_OK == HAL_I2C_Master_Receive(&hi2c1, BMP_I2C_ADD, tempArray, 6, HAL_MAX_DELAY)){
+
+		}
+	}
+
+	return (float)BMP280_compensateTemp(tempArray, rawTemp)/100;
+}
+```
+La fonction ci-dessous est fournie dans la documentation du capteur BMP280.
+```c
+uint32_t BMP280_compensateTemp(uint8_t *calib, uint32_t rawTemp){
+	uint32_t dig_T1 = calib[0] | calib[1]<<8;
+	uint32_t dig_T2 = calib[2] | calib[3]<<8;
+	uint32_t dig_T3	= calib[4] | calib[5]<<8;
+
+	uint32_t var1 = ((((rawTemp >> 3) - (dig_T1 << 1)))
+			* dig_T2) >> 11;
+	uint32_t var2 = (((((rawTemp >> 4) - dig_T1)
+			* ((rawTemp >> 4) - dig_T1)) >> 12)
+			* dig_T3) >> 14;
+
+	uint32_t t_fine = var1 + var2;
+
+	return (t_fine * 5 + 128) >> 8;
+}
+```
+
+__5.Récupération de la pression compensée__
+
+Même principe pour obtenir la pression compensée : 
+
+```c
+float BMP280_readRawPress(){
+	uint8_t press_msb_register = (uint8_t)PRESS_MSB;
+	uint8_t press_frame_rx[3];
+
+	if(HAL_OK == HAL_I2C_Master_Transmit(&hi2c1, BMP_I2C_ADD, &press_msb_register, 1, HAL_MAX_DELAY)){
+		if(HAL_OK == HAL_I2C_Master_Receive(&hi2c1, BMP_I2C_ADD, press_frame_rx, 3, HAL_MAX_DELAY)){
+
+		}
+	}
+
+	uint32_t rawPress = (press_frame_rx[0]<<12) + (press_frame_rx[1]<<4) + (press_frame_rx[2]>>4);
+
+	uint8_t pressArray[18] = {0};
+	press_msb_register = (uint8_t)CALIB_PRESS_START;
+
+	if(HAL_OK == HAL_I2C_Master_Transmit(&hi2c1, BMP_I2C_ADD, &press_msb_register, 1, HAL_MAX_DELAY)){
+		if(HAL_OK == HAL_I2C_Master_Receive(&hi2c1, BMP_I2C_ADD, pressArray, 6, HAL_MAX_DELAY)){
+
+		}
+	}
+
+
+	return BMP280_compensatePress(pressArray, rawPress)/256;
+}
+```
+
+```c
+uint32_t BMP280_compensatePress(uint8_t *calib, uint32_t rawPress) {
+	uint32_t dig_P1 = calib[0] | calib[1]<<8;
+	uint32_t dig_P2 = calib[2] | calib[3]<<8;
+	uint32_t dig_P3	= calib[4] | calib[5]<<8;
+	uint32_t dig_P4	= calib[6] | calib[7]<<8;
+	uint32_t dig_P5	= calib[8] | calib[9]<<8;
+	uint32_t dig_P6	= calib[10] | calib[11]<<8;
+	uint32_t dig_P7	= calib[12] | calib[13]<<8;
+	uint32_t dig_P8	= calib[14] | calib[15]<<8;
+	uint32_t dig_P9	= calib[16] | calib[17]<<8;
+
+	uint32_t t_fine = 0;
+	uint64_t var1, var2, p;
+
+	var1 = ((uint64_t)t_fine) - 128000;
+	var2 = var1 * var1 * (uint64_t)dig_P6;
+	var2 = var2 + ((var1*(uint64_t)dig_P5)<<17);
+	var2 = var2 + (((uint64_t)dig_P4)<<35);
+	var1 = ((var1 * var1 * (uint64_t)dig_P3)>>8) + ((var1 * (uint64_t)dig_P2)<<12);
+	var1 = (((((uint64_t)1)<<47)+var1))*((uint64_t)dig_P1)>>33;
+	if(var1 == 0) {
+		return 0;
+	}
+	p = 1048576-rawPress;
+	p = (((p<<31)-var2)*3125)/var1;
+	var1 = (((uint64_t)dig_P9) * (p>>13) * (p>>13)) >> 25;
+	var2 = (((uint64_t)dig_P8) * p) >> 19;
+	p = ((p + var1 + var2) >> 8) + (((uint64_t)dig_P7)<<4);
+	return (uint32_t)p;
+}
+```
 
 #TP3
 
