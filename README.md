@@ -70,7 +70,7 @@ uint8_t BMP280_config(){
 	return ctrl_meas_rx_value;
 }
 ```
-Pour configurer le BMP280, on envoie deux octets. Le premier contenant l'adresse du registre à modifier ici CTRL_MEAS et le second la valeur que l'on veut écrire. On créé un tableau de 2 éléments prenant ces deux paramètres et on les envoie à l'aide de la fonction HAL.<\br>
+Pour configurer le BMP280, on envoie deux octets. Le premier contenant l'adresse du registre à modifier ici CTRL_MEAS et le second la valeur que l'on veut écrire. On créé un tableau de 2 éléments prenant ces deux paramètres et on les envoie à l'aide de la fonction HAL.<br/>
 On a de plus ajouté la possibilité pour l'utilisateur de contrôler si la valeur a bien été écrite en la retournant.
 
 __3.Récupération de l'étalonnage, de la température et de la pression__
