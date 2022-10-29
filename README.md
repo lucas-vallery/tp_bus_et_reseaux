@@ -202,7 +202,15 @@ uint32_t BMP280_compensatePress(uint8_t *calib, uint32_t rawPress) {
 }
 ```
 
-#TP3
+## TP3 - Interface REST
+
+A l'aide de la bibiothèque Flask, nous avons développé notre serveur web sur la Raspberry Pi 0.
+Ce serveur doit faire ses réponses au format JSON et traiter les différentes méthodes HTTP
+
+Durant ce TP, nous avons travaillé sur la chaîne de caractères suivante : 
+```python
+welcome = "Welcome to 3ESE API!"
+```
 
 ### Réponse d'une requette GET
 ```
