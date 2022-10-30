@@ -243,6 +243,21 @@ def api_welcome_index(index):
 
 Cette fonction nous permet de retourner la lettre à la position index du mot welcome sous le format JSON. Si cet index est supérieur à la longueur du mot, on renvoie sur une page signalant une erreur 404.
 
+```python
+@app.route('/api/welcome/<int:index>', methods=['PATCH'])
+def api_welcome_patch_index(index):
+        global welcome
+        data = request.get_json()
+        if index >len(welcome) or len(data) != 1 :
+                abort(404)
+        else :
+                temp = list(welcome)
+                temp[index] = data
+                welcome = "".join(temp)
+                return welcome + "\r\n"
+```
+Cette fonction a pour but de remplacer un caractère de la chaîne welcome à la position index. Si l'index est supérieur à la longueur du mot ou que la data n'est pas une lettre, on renvoie sur une erreur 404. Si ce n'est pas le cas, on transforme la chaîne welcome en liste afin de lui affecter data en position index. Enfin, on utilise "".join(temp) pour avoir notre welcome modifié.
+
 ### Réponse d'une requette GET
 ```
  "args": {},
