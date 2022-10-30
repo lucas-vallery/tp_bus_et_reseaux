@@ -258,6 +258,40 @@ def api_welcome_patch_index(index):
 ```
 Cette fonction a pour but de remplacer un caractère de la chaîne welcome à la position index. Si l'index est supérieur à la longueur du mot ou que la data n'est pas une lettre, on renvoie sur une erreur 404. Si ce n'est pas le cas, on transforme la chaîne welcome en liste afin de lui affecter data en position index. Enfin, on utilise "".join(temp) pour avoir notre welcome modifié.
 
+```python
+@app.route('/api/welcome/<int:index>', methods=['DELETE'])
+def api_welcome_delete_index(index):
+        global welcome
+        if index > len(welcome):
+                abort(404)
+        else :
+                temp = list(welcome)
+                temp.pop(index)
+                welcome = "".join(temp)
+                return welcome + "\r\n"
+```
+
+Ci-dessus, on supprime le caractère index de welcome en utilisant la méthode pop pour une liste.
+
+```python
+@app.route('/api/welcome/', methods=['DELETE'])
+def api_welcome_delete():
+        global welcome
+        welcome = ""
+        return welcome + "\r\n"
+```
+Pour supprimer la totalité de la chaîne, il suffit de renvoyer un caractère vide.
+
+```python
+@app.route('/api/welcome/', methods=['POST'])
+def api_welcome_post():
+        global welcome
+        if request.method == 'POST':
+                welcome = request.get_json()
+        return welcome + "\r\n"
+```
+Lorsque l'on a supprimé la chaîne, on la recréé grâce à la méthode POST. Si la requête est un POST, alors welcome prend comme valeur la chaîne que l'on écrite en donnée.
+
 ### Réponse d'une requette GET
 ```
  "args": {},
