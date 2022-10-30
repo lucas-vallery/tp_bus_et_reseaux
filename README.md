@@ -4,7 +4,7 @@
 
 - [Introduction](#introduction)
 - [TP1 - Bus I2C](#TP1---bus-i2c)
-- [TP2 - Interfaçage STM32 - Raspberry](#TP2---interfacage-STM32---raspberry)
+- [TP2 - Interfaçage STM32 - Raspberry](#tp2---interfaçage-stm32---raspberry)
 - [TP3 - Interface REST](#TP3---interface-REST)
 - [TP4 - Bus CAN](#TP4---Bus-CAN)
 - [TP5 - Intégration I²C - Serial - REST - CAN](#TP5---integration-i2c---Serial---REST---CAN)
