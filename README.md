@@ -202,6 +202,13 @@ uint32_t BMP280_compensatePress(uint8_t *calib, uint32_t rawPress) {
 	return (uint32_t)p;
 }
 ```
+## TP2 - Interfaçage STM32 - Raspberry
+
+Dans ce second TP, nous avons dû mettreen place une liaison série entre la STM32 et le Raspberry Pi. Avant de développer cette interface machine/machine, nous avons développé un shell sur notre STM32 pour avoir une interface machine/humain. 
+
+### Shell 
+
+__1. Initialisation du shell__
 
 ## TP3 - Interface REST
 
