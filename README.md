@@ -119,7 +119,8 @@ float BMP280_readRawTemp(){
 	return (float)BMP280_compensateTemp(tempArray, rawTemp)/100;
 }
 ```
-La fonction ci-dessous est fournie dans la documentation du capteur BMP280.
+Cette fonction est divisé en quatre partie. Tout d'abord, on récupère des données du capteur sur 3 octets. Puis, on remet ces données en ordre afin d'obtenir une valeur de température non compensée. Dans la troisième partie, on récupère les 6 octets d'etalonnage que l'on va utiliser pour calculer la température compensée. Enfin, on appelle la fonction ci-dessous (fournie dans la documentation du BMP280 pour calculer cette valeur.
+
 ```c
 uint32_t BMP280_compensateTemp(uint8_t *calib, uint32_t rawTemp){
 	uint32_t dig_T1 = calib[0] | calib[1]<<8;
@@ -140,7 +141,7 @@ uint32_t BMP280_compensateTemp(uint8_t *calib, uint32_t rawTemp){
 
 __5.Récupération de la pression compensée__
 
-Même principe pour obtenir la pression compensée : 
+Même principe pour obtenir la pression compensée sauf qu'il faut récupérer dans ce cas les 18 octets d'étalonnage : 
 
 ```c
 float BMP280_readRawPress(){
@@ -159,7 +160,7 @@ float BMP280_readRawPress(){
 	press_msb_register = (uint8_t)CALIB_PRESS_START;
 
 	if(HAL_OK == HAL_I2C_Master_Transmit(&hi2c1, BMP_I2C_ADD, &press_msb_register, 1, HAL_MAX_DELAY)){
-		if(HAL_OK == HAL_I2C_Master_Receive(&hi2c1, BMP_I2C_ADD, pressArray, 6, HAL_MAX_DELAY)){
+		if(HAL_OK == HAL_I2C_Master_Receive(&hi2c1, BMP_I2C_ADD, pressArray, 18, HAL_MAX_DELAY)){
 
 		}
 	}
