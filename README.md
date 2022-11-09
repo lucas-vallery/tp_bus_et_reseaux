@@ -219,6 +219,33 @@ Durant ce TP, nous avons travaillé sur la chaîne de caractères suivante :
 ```python
 welcome = "Welcome to 3ESE API!"
 ```
+### Méthode POST
+
+```python
+@app.route('/api/request/', methods=['GET', 'POST'])
+@app.route('/api/request/<path>', methods=['GET','POST'])
+def api_request(path=None):
+    resp = {
+            "method":   request.method,
+            "url" :  request.url,
+            "path" : path,
+            "args": request.args,
+            "headers": dict(request.headers),
+    }
+    if request.method == 'POST':
+        resp["POST"] = {
+                "data" : request.get_json(),
+                }
+    return jsonify(resp)
+```
+    
+L'objectif étant d'avoir une réponse qui remplisse les champs args et data.
+Pour cela, on va utiliser la ligne de commande suivante : 
+
+```linux
+curl -X POST -H 'Content-Type: application/json' http://192.168.88.214:5000/api/request/ -d '{"name": "Lucas"}'
+```
+
 ### API CRUD
 
 Nous avons implémenté l'API CRUD suivante : 
