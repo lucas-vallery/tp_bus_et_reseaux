@@ -240,11 +240,32 @@ def api_request(path=None):
 ```
     
 L'objectif étant d'avoir une réponse qui remplisse les champs args et data.
+
 Pour cela, on va utiliser la ligne de commande suivante : 
 
-```linux
+```
 curl -X POST -H 'Content-Type: application/json' http://192.168.88.214:5000/api/request/ -d '{"name": "Lucas"}'
 ```
+Voici la réponse sur la console : 
+
+```
+"POST": {
+    "data": {
+      "Name": "Lucas"
+    }
+  },
+  "args": {},
+  "headers": {
+    "Accept": "*/*",
+    "Content-Length": "18",
+    "Content-Type": "application/json",
+    "Host": "192.168.88.239:5000",
+    "User-Agent": "curl/7.74.0"
+  },
+  "method": "POST",
+  "path": null,
+  "url": "http://192.168.88.239:5000/api/request"
+  ```
 
 ### API CRUD
 
