@@ -119,7 +119,7 @@ float BMP280_readRawTemp(){
 	return (float)BMP280_compensateTemp(tempArray, rawTemp)/100;
 }
 ```
-Cette fonction est divisé en quatre partie. Tout d'abord, on récupère des données du capteur sur 3 octets. Puis, on remet ces données en ordre afin d'obtenir une valeur de température non compensée. Dans la troisième partie, on récupère les 6 octets d'etalonnage que l'on va utiliser pour calculer la température compensée. Enfin, on appelle la fonction ci-dessous (fournie dans la documentation du BMP280 pour calculer cette valeur.
+Cette fonction est divisée en quatre partie. Tout d'abord, on récupère des données du capteur sur 3 octets. Puis, on remet ces données en ordre afin d'obtenir une valeur de température non compensée. Dans la troisième partie, on récupère les 6 octets d'etalonnage que l'on va utiliser pour calculer la température compensée. Enfin, on appelle la fonction ci-dessous (fournie dans la documentation du BMP280 pour calculer cette valeur.
 
 ```c
 uint32_t BMP280_compensateTemp(uint8_t *calib, uint32_t rawTemp){
@@ -209,6 +209,10 @@ Dans ce second TP, nous avons dû mettreen place une liaison série entre la STM
 ### Shell 
 
 __1. Initialisation du shell__
+
+__2. Réception et traitement d'une commande__
+
+### UART avec Python sur Raspberry Pi
 
 ## TP3 - Interface REST
 
