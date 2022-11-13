@@ -25,6 +25,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "BMP280.h"
+#include "shell.h"
 #include <stdio.h>
 /* USER CODE END Includes */
 
@@ -89,7 +90,9 @@ int main(void)
 	MX_GPIO_Init();
 	MX_I2C1_Init();
 	MX_USART2_UART_Init();
+	MX_USART1_UART_Init();
 	/* USER CODE BEGIN 2 */
+
 	uint8_t id = BMP280_getId();
 	printf("id : 0x%x\r\n", id);
 
@@ -102,15 +105,7 @@ int main(void)
 	while (1)
 	{
 		/* USER CODE END WHILE */
-		uint32_t temp = BMP280_readRawTemp();
-		printf("Temp : 0x%x\r\n", temp);
 
-		uint32_t press = BMP280_readRawPress();
-		printf("Press : 0x%x\r\n", press);
-
-		printf("\rn");
-
-		HAL_Delay(1000);
 		/* USER CODE BEGIN 3 */
 	}
 	/* USER CODE END 3 */
@@ -164,7 +159,18 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef* huart){
+	char charReceived = 0;
+	if(huart->Instance == USART2){
+		shell_charReceived(charReceived);
+		HAL_UART_Receive_IT(&huart2, (uint8_t*)&charReceived, 1);
+	}
 
+	if(huart->Instance == USART1){
+		shell_charReceived(charReceived);
+		HAL_UART_Receive_IT(&huart1, (uint8_t*)&charReceived, 1);
+	}
+}
 /* USER CODE END 4 */
 
 /**
