@@ -204,15 +204,135 @@ uint32_t BMP280_compensatePress(uint8_t *calib, uint32_t rawPress) {
 ```
 ## TP2 - Interfaçage STM32 - Raspberry
 
-Dans ce second TP, nous avons dû mettreen place une liaison série entre la STM32 et le Raspberry Pi. Avant de développer cette interface machine/machine, nous avons développé un shell sur notre STM32 pour avoir une interface machine/humain. 
+Dans ce second TP, nous avons dû mettreen place une liaison série entre la STM32 et le Raspberry Pi. Pour permettre la communication entre ces deux machines nous avons devellopé un shell sur la STM32.
 
-### Shell 
+### Shell sur STM32
 
 __1. Initialisation du shell__
 
-__2. Réception et traitement d'une commande__
+Tout d'abord, nous commençons par configurer l'UART1 à 115200 bauds en autorisant les interruptions. Nous écrivons le code relatif au shell dans deux fichiers séparés s'appelant shell.c et shell.h. Nous autorisons la réception de caractères et le déclenchement d'interruptions en appelant la fonction suivante juste avant d'entrer dans la boucle infinie.
+```c
+void shell_startRxIt(){
+	HAL_UART_Receive_IT(&huart1, (uint8_t*) &lastChar, 1);
+}
+```
+
+__2. Réception d'une commande__
+
+Quand nous recevons un caractère, une interruption est generée et la fonction callback suivante est appelée :
+```c
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef* huart){
+	if(huart->Instance == USART1){
+		HAL_UART_Receive_IT(&huart1, (uint8_t*) &lastChar, 1);
+		shell_charReceived(lastChar);
+	}
+}
+```
+Nous traitons alors le caractère fraichement reçu de la manière suivante :
+```c
+void shell_charReceived(char charReceived) {
+	if(charReceived != '\r' || indexBuff < BUFF_SIZE){
+		HAL_UART_Transmit(&huart1, (uint8_t*) &charReceived, 1, HAL_MAX_DELAY);
+		charBuffer[indexBuff] = charReceived;
+	} else {
+		indexBuff = 0;
+		
+		shell_execute(charBuffer);
+		shell_clearBuffer(charBuffer, BUFF_SIZE);
+	}
+}
+```
+Un buffer nommé charBuffer a été defini en amont et est de taille BUFF_SIZE.
+Nous traitons les données reçues de la manière suivante :
+* Si le caractère reçu n'est pas un caractère de retour à la ligne et que le buffer n'est pas plein alors nous stockons le caractère dans un buffer. Nous retournons ce caractère à l'emetteur afin qu'il s'affiche dans le shell. Nous attendons ensuit ele prochian caractère.
+* Sinon, nous executons la commande se trouvant dans le buffer et nous remettons tous les caractères du buffer à '\0'.
+
+__3.  Execution d'une commande__
+
+Une fois la commande entrée par l'utilisateur nous executons cette commande à l'aide de la fonction :
+```c
+void shell_executeCmd(char* cmd){
+	int selectedCmd = -1;
+
+	for(int i = 0; tabCmd[i]; i++) {
+		if(!strcmp(charBuffer, tabCmd[i])){
+			selectedCmd = i;
+		}
+	}
+
+	switch(selectedCmd){
+	case 0 :
+		//Call the corresponding function
+		printf("GET_T command has been used!\r\n");
+		break;
+	case 1 :
+		//Call the corresponding function
+		printf("GET_P command has been used!\r\n");
+		break;
+	case 2 :
+		//Call the corresponding function
+		printf("SET_K command has been used!\r\n");
+		break;
+	case 3 :
+		//Call the corresponding function
+		printf("GET_K command has been used!\r\n");
+		break;
+	case 4 :
+		//Call the corresponding function
+		printf("GET_A command has been used!\r\n");
+		break;
+	default :
+		printf("Unknown command has been called!\r\n");
+	}
+}
+```
+Cette fonction compare la commande saisie par l'utilisateur avec les commandes implémentées dans le système. Ces commandes sont stockées dans une table comme suit :
+```c
+const char *tabCmd[]= {
+		"GET_T",
+		"GET_P",
+		"SET_K",
+		"GET_K",
+		"GET_A"
+};
+```
+Si la commande existe alors la fonction associée à la commande est appelée, sinon un message d'erreur est renvoyé à l'utilisateur.
 
 ### UART avec Python sur Raspberry Pi
+La communication entre la STM32 et le RaspberryPi fonctionne de la même manière sauf que les requêtes ne sont plus entrées par un utilisateur mais par le RaspberryPi.
+Nous implementons les commandes suivantes dans la STM32.
+
+| __Requête du RPI__ 	| __Réponse du STM__ 	| __Commentaire__ 				|
+| --- 			| --- 			| --- 						|
+| GET_T 		| T=+12.50_C 		| Température compensée sur 10 caractères 	|
+| GET_P 		| P=102300Pa 		| Pression compensée sur 10 caractères 		|
+| SET_K=1234 		| SET_K=OK 		| Fixe le coefficient K (en 1/100e) 		|
+| GET_K 		| K=12.34000 		| Coefficient K sur 10 caractères 		|
+| GET_A 		| A=125.7000 		| Angle sur 10 caractères 			|
+
+Enfin, nous utilisons le programme test suivant sur le RaspberryPi pour faire des requêtes au STM32. La manière dont nous avons devellopé notre shell sur la STM32 nous impose de placer un caractère '\r' en fin de chaine afin de signifier la fin de la commande.
+
+```python
+import serial
+
+uart = serial.Serial('/dev/ttyAMA0',115200)
+
+input = input()
+
+if input == 'GET_T':
+       uart.write(b"GET_T\r")
+if input == 'GET_P':
+       uart.write(b'GET_P\r')
+if input == 'SET_K':
+       val = input()
+       uart.write(b'SET_K='+val+'\r')
+if input == 'GET_K':
+       uart.write(b'GET_K\r')
+if input == 'GET_A':
+       uart.write(b'GET_A\r')
+
+r = uart.read(50)
+```
 
 ## TP3 - Interface REST
 
