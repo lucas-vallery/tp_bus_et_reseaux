@@ -35,6 +35,7 @@ uint8_t BMP280_config(){
 	return ctrl_meas_rx_value;
 }
 
+/*
 uint8_t BMP280_Etalonnage(uint8_t* calibration){
 	uint8_t etalonnage_register = (uint8_t)CALIB_START;
 	for (int i = 0; i<26; i++){
@@ -45,6 +46,7 @@ uint8_t BMP280_Etalonnage(uint8_t* calibration){
 		}
 	}
 }
+*/
 
 uint32_t BMP280_readRawTemp(){
 	uint8_t temp_msb_register = (uint8_t)TEMP_MSB;
@@ -74,7 +76,8 @@ uint32_t BMP280_readRawPress(){
 	return rawPress;
 }
 
-
+/*
 uint32_t BMP280_compensateTemp(){
 
 }
+*/
