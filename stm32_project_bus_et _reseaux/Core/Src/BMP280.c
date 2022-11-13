@@ -142,4 +142,3 @@ uint32_t BMP280_compensatePress(uint8_t *calib, uint32_t rawPress) {
 	p = ((p + var1 + var2) >> 8) + (((uint64_t)dig_P7)<<4);
 	return (uint32_t)p;
 }
-
