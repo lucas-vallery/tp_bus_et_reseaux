@@ -578,7 +578,8 @@ Il faut dans un premier temps construire le header de la trame :
 - DLC : entier représentant la taille des données à transmettre.
 - TransmitGlobalTime : dispositif permettant de mesurer les temps de réponse du bus CAN. Le fixer à DISABLE.
 
-
+Dans la seconde partie de la fonction, on construit un tableau de 3 éléments comprenant l'angle, le sens et la vitesse de rotation. 
+Enfin, on envoie notre trame à l'aide de la fonction HAL : HAL_CAN_AddTxMessage()
 
 
 
