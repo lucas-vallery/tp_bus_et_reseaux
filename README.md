@@ -565,11 +565,26 @@ Nous avons développé cela grâce à la documentation du moteur pas à pas.
   
 | __Function__ | __Arbitration ID__ | __D0__ | __D1__ | __D2__ |
 | --- | --- | --- | --- | --- |
-| __Manual Mode__ | 0x60 | Rotation 0x00 --> Anti-Clockwise  0x01 --> Clockwise | Steps 0x01 to OxFF | Speed 0x01 = 1ms  0xFF = 255ms |
-| __Angle__ | 0x61 | 0x01 to 0xFF | Angle sign 0x00 Positive 0x01 Negative | X |
+| __Manual Mode__ | 0x60 | Rotation : 0x00 --> Anti-Clockwise  0x01 --> Clockwise | Steps 0x01 to OxFF | Speed 0x01 = 1ms  0xFF = 255ms |
+| __Angle__ | 0x61 | 0x01 to 0xFF | Angle sign : 0x00 Positive 0x01 Negative | X |
 | __Set internal/ Position to 0__ | 0x62 | X | X | X |
   
-  
-  
- 
-_
+Cette fonction prend en paramètres la structure, l'angle de rotation, le signe de la rotation et la vitesse de rotation. 
+Il faut dans un premier temps construire le header de la trame : 
+- StdId : message Id lorsque celui-ci est dans le mode standard, Ox62 pour la commande en angle et vitesse
+- ExtId : message Id lorsque l'on est en mode étendu. Il est donc nul car on est en mode standard.
+- IDE : définit si la trame est standard (CAN_ID_STD) ou étendue (CAN_ID_EXT).
+- RTR : définit si la trame est du type standard (CAN_RTR_DATA) ou RTR (CAN_RTR_REMOTE).
+- DLC : entier représentant la taille des données à transmettre.
+- TransmitGlobalTime : dispositif permettant de mesurer les temps de réponse du bus CAN. Le fixer à DISABLE.
+
+
+
+
+
+
+
+
+
+
+
