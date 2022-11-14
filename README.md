@@ -1,4 +1,4 @@
-# Tp bus et réseaux – Castellani Vallery
+_# Tp bus et réseaux – Castellani Vallery
 
 ## Table des matières
 
@@ -506,4 +506,28 @@ Lorsque l'on a supprimé la chaîne, on la recréé grâce à la méthode POST. 
   ```
   
   ## TP4 - Bus CAN
+  
+Les cartes STM32L476 sont équipées d'un contrôleur CAN intégré. Pour pouvoir les utiliser, il faut leur adjoindre un Tranceiver CAN. Ce rôle est dévolu à un TJA1050. Ce composant est alimenté en 5V, mais possède des E/S compatibles 3,3V.
+Afin de faciliter sa mise en œuvre, ce composant a été installé sur une carte fille (shield) au format Arduino, qui peut donc s'insérer sur les cartes nucleo64.
+
+Pour ce TP, nous allons utiliser le bus CAN pour piloter le moteur pas à pas.
+Nous avons donc rajouté le périphérique CAN1 avec une vitesse d'exactement 500kbit/s dans notre projet sur les broches PB8 (RX) et PB9 (TX). Pour cela, il a fallu changer de bus I2C, nous sommes passé de I2C1 à I2C2.
+
+De la même façon que pour les TPs précédents, nous avons créé pour le contrôle du moteur pas à pas : stepper.c et stepper.h.
+  
+  __1. Initialisation de la structure__
+  
+```c
+typedef struct stepper_struct{
+	CAN_HandleTypeDef* canHandler;
+	uint16_t K;
+}stepper_t;
+```
+  
+  
+  
+  
+  
+  
  
+_
