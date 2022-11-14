@@ -517,15 +517,56 @@ De la même façon que pour les TPs précédents, nous avons créé pour le cont
   
   __1. Initialisation de la structure__
   
+Voici ci-dessous notre structure pour le stepper : elle contient la référence de notre contrôleur CAN et le coefficient de proportionnalité K. 
+  
 ```c
 typedef struct stepper_struct{
 	CAN_HandleTypeDef* canHandler;
 	uint16_t K;
 }stepper_t;
 ```
+Nous l'initialisons et activons le contrôleur CAN.
+
+```c
+uint8_t stepper_CanInit(stepper_t* stepper, CAN_HandleTypeDef * hcan){
+	stepper->canHandler = hcan;
+	stepper->K = 10;
+	if (HAL_OK != HAL_CAN_Start(stepper->canHandler)){
+		while(1);
+	}
+	return 0;
+}
+```
+
+ __2. Commande d'angle et de vitesse__
+ 
+Pour transmettre un ordre en rotation et en vitesse, nous avons dévéloppé la fonction stepper_WriteAngleSpeed().
+
+```c
+void stepper_WriteAngleSpeed(stepper_t* stepper, uint8_t angle, uint8_t sign, uint8_t speed){
+	CAN_TxHeaderTypeDef pHeader;
+
+	pHeader.StdId = 0x60;
+	pHeader.ExtId = 0;
+	pHeader.IDE = CAN_ID_STD;
+	pHeader.RTR = CAN_RTR_DATA;
+	pHeader.DLC = 3;
+	pHeader.TransmitGlobalTime = DISABLE;
+
+	uint8_t aData[3] = {angle, sign, speed};
+
+	if(HAL_CAN_AddTxMessage(stepper->canHandler, &pHeader, (uint8_t*)&aData, &pTxMailBox) != HAL_OK){
+		Error_Handler();
+	}
+
+}
+```
+Nous avons développé cela grâce à la documentation du moteur pas à pas.
   
-  
-  
+| __Function__ | __Arbitration ID__ | __D0__ | __D1__ | __D2__ |
+| __Manual Mode__ | 0x60 | Rotation 0x00 --> Anti-Clockwise  0x01 --> Clockwise | Steps 0x01 to OxFF | Speed 0x01 = 1ms  0xFF = 255ms |
+| __Angle__ | 0x61 | 0x01 to 0xFF | Angle sign 0x00 Positive 0x01 Negative | X |
+| __Set internal/ Position to 0__ | 0x62 | X | X | X |
   
   
   
