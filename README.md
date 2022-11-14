@@ -564,6 +564,7 @@ void stepper_WriteAngleSpeed(stepper_t* stepper, uint8_t angle, uint8_t sign, ui
 Nous avons développé cela grâce à la documentation du moteur pas à pas.
   
 | __Function__ | __Arbitration ID__ | __D0__ | __D1__ | __D2__ |
+| --- | --- | --- | --- | --- |
 | __Manual Mode__ | 0x60 | Rotation 0x00 --> Anti-Clockwise  0x01 --> Clockwise | Steps 0x01 to OxFF | Speed 0x01 = 1ms  0xFF = 255ms |
 | __Angle__ | 0x61 | 0x01 to 0xFF | Angle sign 0x00 Positive 0x01 Negative | X |
 | __Set internal/ Position to 0__ | 0x62 | X | X | X |
