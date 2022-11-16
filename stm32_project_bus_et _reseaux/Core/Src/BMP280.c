@@ -39,7 +39,7 @@ uint8_t BMP280_Etalonnage(uint8_t* calibration){
 	uint8_t etalonnage_register = (uint8_t)CALIB_TEMP_START;
 	for (int i = 0; i<26; i++){
 		if(HAL_OK == HAL_I2C_Master_Transmit(&hi2c2, BMP_I2C_ADD, &etalonnage_register, 1, HAL_MAX_DELAY)){
-			if(HAL_OK == HAL_I2C_Master_Receive(&hi2c2, BMP_I2C_ADD, &calibration, 26, HAL_MAX_DELAY)){
+			if(HAL_OK == HAL_I2C_Master_Receive(&hi2c2, BMP_I2C_ADD, calibration, 26, HAL_MAX_DELAY)){
 
 			}
 		}
@@ -47,7 +47,7 @@ uint8_t BMP280_Etalonnage(uint8_t* calibration){
 	return 0;
 }
 
-float BMP280_readRawTemp(){
+uint32_t BMP280_readRawTemp(){
 	uint8_t temp_msb_register = (uint8_t)TEMP_MSB;
 	uint8_t temp_frame_rx[3] = {0};
 
@@ -56,8 +56,12 @@ float BMP280_readRawTemp(){
 
 		}
 	}
+	return (temp_frame_rx[0]<<12) | (temp_frame_rx[1]<<4) | (temp_frame_rx[2]>>4);
+}
 
-	uint32_t rawTemp = (temp_frame_rx[0]<<12) | (temp_frame_rx[1]<<4) | (temp_frame_rx[2]>>4);
+float BMP280_readCompensateTemp(){
+	uint8_t temp_msb_register = (uint8_t)TEMP_MSB;
+	uint32_t rawTemp = BMP280_readRawTemp();
 
 	uint8_t tempArray[6] = {0};
 	temp_msb_register = (uint8_t)CALIB_TEMP_START;
@@ -87,9 +91,9 @@ uint32_t BMP280_compensateTemp(uint8_t *calib, uint32_t rawTemp){
 	return (t_fine * 5 + 128) >> 8;
 }
 
-float BMP280_readRawPress(){
-	uint8_t press_msb_register = (uint8_t)PRESS_MSB;
+uint32_t BMP280_readRawPress(){
 	uint8_t press_frame_rx[3] = {0};
+	uint8_t press_msb_register = (uint8_t)PRESS_MSB;
 
 	if(HAL_OK == HAL_I2C_Master_Transmit(&hi2c2, BMP_I2C_ADD, &press_msb_register, 1, HAL_MAX_DELAY)){
 		if(HAL_OK == HAL_I2C_Master_Receive(&hi2c2, BMP_I2C_ADD, press_frame_rx, 3, HAL_MAX_DELAY)){
@@ -97,7 +101,12 @@ float BMP280_readRawPress(){
 		}
 	}
 
-	uint32_t rawPress = (press_frame_rx[0]<<12) | (press_frame_rx[1]<<4) | (press_frame_rx[2]>>4);
+	return (press_frame_rx[0]<<12) | (press_frame_rx[1]<<4) | (press_frame_rx[2]>>4);
+}
+
+float BMP280_readCompensatePress(){
+	uint8_t press_msb_register = (uint8_t)PRESS_MSB;
+	uint32_t rawPress = BMP280_readRawPress();
 
 	uint8_t pressArray[18] = {0};
 	press_msb_register = (uint8_t)CALIB_PRESS_START;
@@ -108,8 +117,7 @@ float BMP280_readRawPress(){
 		}
 	}
 
-
-	return BMP280_compensatePress(pressArray, rawPress)/256;
+	return BMP280_compensatePress(pressArray, rawPress)/256.0;
 }
 
 uint32_t BMP280_compensatePress(uint8_t *calib, uint32_t rawPress) {

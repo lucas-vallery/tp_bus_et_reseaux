@@ -31,8 +31,10 @@ extern I2C_HandleTypeDef hi2c2;
 
 uint8_t BMP280_getId();
 uint8_t BMP280_config();
-float BMP280_readRawTemp();
-float BMP280_readRawPress();
+uint32_t BMP280_readRawTemp();
+float BMP280_readCompensateTemp();
+uint32_t BMP280_readRawPress();
+float BMP280_readCompensatePress();
 uint32_t BMP280_compensateTemp(uint8_t *etalonnage, uint32_t rawTemp);
 uint8_t BMP280_Etalonnage(uint8_t* calibration);
 uint32_t BMP280_compensatePress(uint8_t *calib, uint32_t rawPress);
