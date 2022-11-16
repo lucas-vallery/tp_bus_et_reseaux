@@ -606,7 +606,7 @@ Enfin, on envoie notre trame à l'aide de la fonction HAL : HAL_CAN_AddTxMessage
 | Delete | DELETE | temp/x | Delete temperature #x |
 | Delete | DELETE | pres/x | Delete pressure #x |
 
-
+![Ajouter une température](images/postTemp.png)
 
 
 
