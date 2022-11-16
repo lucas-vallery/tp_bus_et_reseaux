@@ -7,7 +7,7 @@ _# Tp bus et réseaux – Castellani Vallery
 - [TP2 - Interfaçage STM32 - Raspberry](#tp2---interfaçage-stm32---raspberry)
 - [TP3 - Interface REST](#TP3---interface-REST)
 - [TP4 - Bus CAN](#TP4---Bus-CAN)
-- [TP5 - Intégration I²C - Serial - REST - CAN](#TP5---integration-i2c---Serial---REST---CAN)
+- [TP5 - Intégration I2C - Serial - REST - CAN](#TP5---integration-i2c---Serial---REST---CAN)
 - [Conclusion](#conclusion)
 
 ## Introduction
@@ -18,7 +18,8 @@ Ces différents TPs nous ont permis de réaliser :
 - Une interface Web sur le Raspberry Pi
 - Une liaison CAN entre la STM32 et une carte pilotant un moteur pas à pas
 
-<img src="/Users/jean-francoiscastellani/Downloads/path1315-0-9-37.png" width="80%" height="80%">
+![Schema introductif des TPs](images/presentation.png)
+
 
 ## TP1 - Bus I2C
 
@@ -582,7 +583,7 @@ Dans la seconde partie de la fonction, on construit un tableau de 3 éléments c
 Enfin, on envoie notre trame à l'aide de la fonction HAL : HAL_CAN_AddTxMessage().
 
 
-  ## TP5 - Intégration I²C - Serial - REST - CAN
+  ## TP5 - Intégration I2C - Serial - REST - CAN
   
   ### Commande du moteur pas à pas en fonction du capteur de température avec le STM32
   
