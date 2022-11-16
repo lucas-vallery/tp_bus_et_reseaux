@@ -49,7 +49,7 @@ uint8_t BMP280_Etalonnage(uint8_t* calibration){
 
 float BMP280_readRawTemp(){
 	uint8_t temp_msb_register = (uint8_t)TEMP_MSB;
-	uint8_t temp_frame_rx[3];
+	uint8_t temp_frame_rx[3] = {0};
 
 	if(HAL_OK == HAL_I2C_Master_Transmit(&hi2c2, BMP_I2C_ADD, &temp_msb_register, 1, HAL_MAX_DELAY)){
 		if(HAL_OK == HAL_I2C_Master_Receive(&hi2c2, BMP_I2C_ADD, temp_frame_rx, 3, HAL_MAX_DELAY)){
@@ -57,7 +57,7 @@ float BMP280_readRawTemp(){
 		}
 	}
 
-	uint32_t rawTemp = (temp_frame_rx[0]<<12) + (temp_frame_rx[1]<<4) + (temp_frame_rx[2]>>4);
+	uint32_t rawTemp = (temp_frame_rx[0]<<12) | (temp_frame_rx[1]<<4) | (temp_frame_rx[2]>>4);
 
 	uint8_t tempArray[6] = {0};
 	temp_msb_register = (uint8_t)CALIB_TEMP_START;
@@ -89,7 +89,7 @@ uint32_t BMP280_compensateTemp(uint8_t *calib, uint32_t rawTemp){
 
 float BMP280_readRawPress(){
 	uint8_t press_msb_register = (uint8_t)PRESS_MSB;
-	uint8_t press_frame_rx[3];
+	uint8_t press_frame_rx[3] = {0};
 
 	if(HAL_OK == HAL_I2C_Master_Transmit(&hi2c2, BMP_I2C_ADD, &press_msb_register, 1, HAL_MAX_DELAY)){
 		if(HAL_OK == HAL_I2C_Master_Receive(&hi2c2, BMP_I2C_ADD, press_frame_rx, 3, HAL_MAX_DELAY)){
@@ -97,7 +97,7 @@ float BMP280_readRawPress(){
 		}
 	}
 
-	uint32_t rawPress = (press_frame_rx[0]<<12) + (press_frame_rx[1]<<4) + (press_frame_rx[2]>>4);
+	uint32_t rawPress = (press_frame_rx[0]<<12) | (press_frame_rx[1]<<4) | (press_frame_rx[2]>>4);
 
 	uint8_t pressArray[18] = {0};
 	press_msb_register = (uint8_t)CALIB_PRESS_START;

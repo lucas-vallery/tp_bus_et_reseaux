@@ -109,7 +109,9 @@ int main(void)
 	stepper_CanInit(&stepper, &hcan1);
 	stepper_set0(&stepper);
 
-
+	uint8_t angle = 0;
+	uint8_t sign = 0;
+	float previousTemp = 0;
 
 
   /* USER CODE END 2 */
@@ -119,6 +121,21 @@ int main(void)
 	while (1)
 	{
 		float temp = BMP280_readRawTemp();
+		printf("Température : %f °C\r\n", temp);
+		angle = (temp - previousTemp) * stepper.K;
+		previousTemp = temp;
+
+		if (angle >= 0){
+			sign = 0;
+		}
+		else{
+			sign = 1;
+			angle *= 1;
+		}
+
+		stepper_WriteAngleSpeed(&stepper, angle, sign, 0x4F);
+
+		HAL_Delay(1000);
 
 
     /* USER CODE END WHILE */
