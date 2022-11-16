@@ -1,4 +1,4 @@
-# Tp bus et réseaux – Castellani Vallery
+_# Tp bus et réseaux – Castellani Vallery
 
 ## Table des matières
 
@@ -506,4 +506,86 @@ Lorsque l'on a supprimé la chaîne, on la recréé grâce à la méthode POST. 
   ```
   
   ## TP4 - Bus CAN
+  
+Les cartes STM32L476 sont équipées d'un contrôleur CAN intégré. Pour pouvoir les utiliser, il faut leur adjoindre un Tranceiver CAN. Ce rôle est dévolu à un TJA1050. Ce composant est alimenté en 5V, mais possède des E/S compatibles 3,3V.
+Afin de faciliter sa mise en œuvre, ce composant a été installé sur une carte fille (shield) au format Arduino, qui peut donc s'insérer sur les cartes nucleo64.
+
+Pour ce TP, nous allons utiliser le bus CAN pour piloter le moteur pas à pas.
+Nous avons donc rajouté le périphérique CAN1 avec une vitesse d'exactement 500kbit/s dans notre projet sur les broches PB8 (RX) et PB9 (TX). Pour cela, il a fallu changer de bus I2C, nous sommes passé de I2C1 à I2C2.
+
+De la même façon que pour les TPs précédents, nous avons créé pour le contrôle du moteur pas à pas : stepper.c et stepper.h.
+  
+  __1. Initialisation de la structure__
+  
+Voici ci-dessous notre structure pour le stepper : elle contient la référence de notre contrôleur CAN et le coefficient de proportionnalité K. 
+  
+```c
+typedef struct stepper_struct{
+	CAN_HandleTypeDef* canHandler;
+	uint16_t K;
+}stepper_t;
+```
+Nous l'initialisons et activons le contrôleur CAN.
+
+```c
+uint8_t stepper_CanInit(stepper_t* stepper, CAN_HandleTypeDef * hcan){
+	stepper->canHandler = hcan;
+	stepper->K = 10;
+	if (HAL_OK != HAL_CAN_Start(stepper->canHandler)){
+		while(1);
+	}
+	return 0;
+}
+```
+
+ __2. Commande d'angle et de vitesse__
  
+Pour transmettre un ordre en rotation et en vitesse, nous avons dévéloppé la fonction stepper_WriteAngleSpeed().
+
+```c
+void stepper_WriteAngleSpeed(stepper_t* stepper, uint8_t angle, uint8_t sign, uint8_t speed){
+	CAN_TxHeaderTypeDef pHeader;
+
+	pHeader.StdId = 0x60;
+	pHeader.ExtId = 0;
+	pHeader.IDE = CAN_ID_STD;
+	pHeader.RTR = CAN_RTR_DATA;
+	pHeader.DLC = 3;
+	pHeader.TransmitGlobalTime = DISABLE;
+
+	uint8_t aData[3] = {angle, sign, speed};
+
+	if(HAL_CAN_AddTxMessage(stepper->canHandler, &pHeader, (uint8_t*)&aData, &pTxMailBox) != HAL_OK){
+		Error_Handler();
+	}
+
+}
+```
+Nous avons développé cela grâce à la documentation du moteur pas à pas.
+  
+| __Function__ | __Arbitration ID__ | __D0__ | __D1__ | __D2__ |
+| --- | --- | --- | --- | --- |
+| __Manual Mode__ | 0x60 | Rotation : 0x00 --> Anti-Clockwise  0x01 --> Clockwise | Steps 0x01 to OxFF | Speed 0x01 = 1ms  0xFF = 255ms |
+| __Angle__ | 0x61 | 0x01 to 0xFF | Angle sign : 0x00 Positive 0x01 Negative | X |
+| __Set internal/ Position to 0__ | 0x62 | X | X | X |
+  
+Cette fonction prend en paramètres la structure, l'angle de rotation, le signe de la rotation et la vitesse de rotation. 
+Il faut dans un premier temps construire le header de la trame : 
+- StdId : message Id lorsque celui-ci est dans le mode standard, Ox62 pour la commande en angle et vitesse
+- ExtId : message Id lorsque l'on est en mode étendu. Il est donc nul car on est en mode standard.
+- IDE : définit si la trame est standard (CAN_ID_STD) ou étendue (CAN_ID_EXT).
+- RTR : définit si la trame est du type standard (CAN_RTR_DATA) ou RTR (CAN_RTR_REMOTE).
+- DLC : entier représentant la taille des données à transmettre.
+- TransmitGlobalTime : dispositif permettant de mesurer les temps de réponse du bus CAN. Le fixer à DISABLE.
+
+Dans la seconde partie de la fonction, on construit un tableau de 3 éléments comprenant l'angle, le sens et la vitesse de rotation. 
+Enfin, on envoie notre trame à l'aide de la fonction HAL : HAL_CAN_AddTxMessage().
+
+
+
+
+
+
+
+
+
