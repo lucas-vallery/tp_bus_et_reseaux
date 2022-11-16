@@ -582,6 +582,30 @@ Dans la seconde partie de la fonction, on construit un tableau de 3 éléments c
 Enfin, on envoie notre trame à l'aide de la fonction HAL : HAL_CAN_AddTxMessage().
 
 
+  ## TP5 - Intégration I²C - Serial - REST - CAN
+  
+  ### Commande du moteur pas à pas en fonction du capteur de température avec le STM32
+  
+  
+  
+  ### API REST
+  
+  Nous avons implémenté l'API suivante : 
+
+| __CRUD__ | __Method__ | __Path__ | __Action__ |
+| --- | --- | --- | --- |
+| Create | POST | temp/ | Retrieve new temperature |
+| Create | POST | pres/ | Retrieve new pressure |
+| Retrieve | GET | temp/ | Return all previous temperatures |
+| Retrieve | GET | temp/x | Return temperature #x |
+| Retrieve | GET | pres/ | Return all previous pressures |
+| Retrieve | GET | pres/x | Return pressure #x |
+| Retrieve | GET | scale/ | Return scale (K) |
+| Retrieve | GET | angle/ | Return angle (temp x scale) |
+| Update | POST | scale/x | Change scale (K) for x |
+| Delete | DELETE | temp/x | Delete temperature #x |
+| Delete | DELETE | pres/x | Delete pressure #x |
+
 
 
 
