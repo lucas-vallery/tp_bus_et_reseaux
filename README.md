@@ -608,6 +608,16 @@ Enfin, on envoie notre trame à l'aide de la fonction HAL : HAL_CAN_AddTxMessage
 
 ![Ajouter une température](images/postTemp.png)
 
+![Modifier la valeur de K](images/scale.png)
+
+![Obtenir le coefficient de proportionnalité](images/getScale.png)
+
+![Supprimer une température](images/deleteTemp.png)
+
+![Communication entre la stm32 et la raspberry](images/finalcut.png)
+
+![Tableau des températures](images/getAllTemp.png)
+
 
 
 
