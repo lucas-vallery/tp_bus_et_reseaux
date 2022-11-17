@@ -28,7 +28,7 @@ Dans cette partie nous détaillerons la configuration du microcontrôleur utilis
 L'horloge (HCLK) du microcontrôleur provient du HSE et est configurée à 80 Mhz. Les autres paramètres concernant la configuration des horloges sont inchangés.
 
 ### Bus I2C
-Le bus I2C utilisé est le bus I2C 2. Nous utilisons la broche PB10 pour le signal d'horloge (SCL) et PC12 pour les données (SDA). Tous les paramètres sont les paramètres par défaut et aucune interruption n'est autorisée.
+Le bus I2C utilisé est le bus I²C 2. Nous utilisons la broche PB10 pour le signal d'horloge (SCL) et PC12 pour les données (SDA). Tous les paramètres sont les paramètres par défaut et aucune interruption n'est autorisée.
 
 ### Communications série
 * L'USART 1 est utilisée pour communiquer avec le Raspberry Pi à 115200 bit/s. Les interruptions sont autorisées. Les broches utilisées sont PA9(TX) et PA10(RX).
@@ -45,10 +45,10 @@ Les autres paramètres sont inchangés.
 
 ## TP1 - Bus I2C
 
-Dans ce premier TP nous cherchons à mettre en place une communication I²C entre entre le microcontrôleur et deux composants I²C. Le microncontrôleur STM32 joue le rôle de maître sur le bus.
+Dans ce premier TP nous cherchons à mettre en place une communication I²C entre entre le microcontrôleur et deux composants I²C. Le microncontrôleur STM32 joue le rôle du maître sur le bus.
 
 ### Capteur BMP280
-La capteur BMP280 est un capteur de température et de pression. Ces deux grandeurs sont mesurées par deux composants I²C distincts.
+La capteur BMP280 est un capteur de température et de pression.
 
 ### Librairie pour le BMP280
 
@@ -75,7 +75,7 @@ __2. Configuration du BMP280__
 Pour configurer le BMP280 en "mode normal", nous devons envoyer deux octets. Le premier contenant l'adresse du registre à modifier ici CTRL_MEAS et le second contenant la valeur que l'on veut écrire. On créé un tableau de 2 éléments contenant ces octets et nous les envoyons à l'aide de la fonction HAL_I2C_Master_Transmit.<br/>
 Nous venons ensuite lire la valeur contenue dans le registre que nous venons de modifier afin de vérifier que le processus d'écriture s'est correctement déroulé. La foncion BMP280_config effectue les actions décrites précédemment.
 <br/>
-Nous noterons une particularité de l'I2C. En effet, pour lire un registre, il faut d'abord écrire sur le bus l'adresse du registre que nous voulons lire afin de positionner la "tête de lecture" et enfin lire la valeur sur le bus à l'aide de HAL_I2C_Master_Receive.<br/>
+Nous noterons une particularité de l'I²C. En effet, pour lire un registre, il faut d'abord écrire sur le bus l'adresse du registre que nous voulons lire afin de positionner la "tête de lecture" puis lire la valeur sur le bus à l'aide de HAL_I2C_Master_Receive.<br/>
 En revanche, l'écriture se fait en transmettant l'adresse du registre ou l'on veut écrire puis la valeur que l'on veut y mettre.
 
 ```c
@@ -117,7 +117,7 @@ uint8_t BMP280_Etalonnage(uint8_t* calibration){
 
 __4.Récupération de la température et de la température compensée__
 
-La fonction ci dessous permet de récupérer les données de température sur 3 octets. Les données sont remise en forme afin d'obtenir une valeur exploitable.
+La fonction ci dessous permet de récupérer les données de température sur 3 octets. Les données sont remises en forme afin d'obtenir une valeur exploitable.
 
 ```c
 uint32_t BMP280_readRawTemp(){
@@ -132,7 +132,7 @@ uint32_t BMP280_readRawTemp(){
 	return (temp_frame_rx[0]<<12) | (temp_frame_rx[1]<<4) | (temp_frame_rx[2]>>4);
 }
 ```
-Dans cette seconde fonction, nous récupèrons les 6 octets d'etalonnage que nous allons utiliser pour calculer la température compensée. Enfin, nous appelons la fonction ci-dessous (fournie dans la documentation du BMP280 pour calculer cette valeur).
+Dans cette seconde fonction, nous récupèrons les 6 octets d'etalonnage que nous allons utiliser pour calculer la température compensée. Enfin, nous appelons la fonction ci-dessous (fournie dans la documentation du BMP280) pour calculer cette valeur.
 
 ```c
 uint32_t BMP280_compensateTemp(uint8_t *calib, uint32_t rawTemp){
@@ -247,7 +247,7 @@ Dans ce second TP, nous avons dû mettre en place une liaison série entre la ST
 
 __1. Initialisation du shell__
 
-Tout d'abord, nous commençons par configurer l'UART1 à 115200 bauds en autorisant les interruptions. Nous écrivons le code relatif au shell dans deux fichiers séparés s'appelant shell.c et shell.h. Nous autorisons la réception de caractères et le déclenchement d'interruptions en appelant la fonction suivante juste avant d'entrer dans la boucle infinie.
+Tout d'abord, nous commençons par configurer l'UART1 à 115200 bit/s en autorisant les interruptions. Nous écrivons le code relatif au shell dans deux fichiers séparés s'appelant shell.c et shell.h. Nous autorisons la réception de caractères et le déclenchement d'interruptions en appelant la fonction suivante juste avant d'entrer dans la boucle infinie.
 ```c
 void shell_startRxIt(){
 	HAL_UART_Receive_IT(&huart1, (uint8_t*) &lastChar, 1);
@@ -281,7 +281,7 @@ void shell_charReceived(char charReceived) {
 ```
 Un buffer nommé charBuffer a été defini en amont et est de taille BUFF_SIZE.
 Nous traitons les données reçues de la manière suivante :
-* Si le caractère reçu n'est pas un caractère de retour à la ligne et que le buffer n'est pas plein alors nous stockons le caractère dans un buffer. Nous retournons ce caractère à l'emetteur afin qu'il s'affiche dans le shell. Nous attendons ensuit ele prochian caractère.
+* Si le caractère reçu n'est pas un caractère de retour à la ligne et que le buffer n'est pas plein alors nous stockons le caractère dans un buffer. Nous retournons ce caractère à l'emetteur afin qu'il s'affiche dans le shell. Nous attendons ensuit le prochian caractère.
 * Sinon, nous executons la commande se trouvant dans le buffer et nous remettons tous les caractères du buffer à '\0'.
 
 __3.  Execution d'une commande__
@@ -336,7 +336,7 @@ const char *tabCmd[]= {
 Si la commande existe alors la fonction associée à la commande est appelée, sinon un message d'erreur est renvoyé à l'utilisateur.
 
 ### UART avec Python sur Raspberry Pi
-La communication entre la STM32 et le RaspberryPi fonctionne de la même manière sauf que les requêtes ne sont plus entrées par un utilisateur mais par le RaspberryPi.
+La communication entre la STM32 et le Raspberry Pi fonctionne de la même manière sauf que les requêtes ne sont plus entrées par un utilisateur mais par le RaspberryPi.
 Nous implementons les commandes suivantes dans la STM32.
 
 | __Requête du RPI__ 	| __Réponse du STM__ 	| __Commentaire__ 				|
@@ -347,7 +347,7 @@ Nous implementons les commandes suivantes dans la STM32.
 | GET_K 		| K=12.34000 		| Coefficient K sur 10 caractères 		|
 | GET_A 		| A=125.7000 		| Angle sur 10 caractères 			|
 
-Enfin, nous utilisons le programme test suivant sur le RaspberryPi pour faire des requêtes au STM32. La manière dont nous avons devellopé notre shell sur la STM32 nous impose de placer un caractère '\r' en fin de chaine afin de signifier la fin de la commande.
+Enfin, nous utilisons le programme test suivant sur le Raspberry Pi pour faire des requêtes au STM32. La manière dont nous avons devellopé notre shell sur la STM32 nous impose de placer un caractère '\r' en fin de chaine afin de signifier la fin de la commande. De plus, nous ne renvoyons plus les caractères reçus à l'émeteur, en effet ce n'est plus un shell avec le besoin d'avoir un retour visuel des commandes saisies mais un machine qui envoie les caractères. 
 
 ```python
 import serial
@@ -748,13 +748,13 @@ def postTemp():
 ## Conclusion
 
 Durant ces 5 séances de TPs, nous avons réussi à : 
-- récupérer les données du capteur de température et de pression
-- récupérer les données sur le Raspberry par l'intermédiaire de notre shell
-- piloter le moteur pas à pas avec le bus CAN
-- créer une API REST pour stocker les valeurs
+- Récupérer les données du capteur de température et de pression
+- Récupérer les données sur le Raspberry par l'intermédiaire de notre shell
+- Piloter le moteur pas à pas avec le bus CAN
+- Créer une API REST pour stocker les valeurs
 
 Enfin, nous avons réussi à faire fonctionner tous ces modules ensemble. On a réalisé une requête avec la raspberry qui a demandé à la stm32 et donc au capteur la valeur de la température. Le microprocesseur renvoie la valeur de la température et l'API la stocke dans un tableau. 
-Si nous avions eu plus de temps, nous aurions réalisé la même procédure pour l'obtention de la pression et pour le réglage du coefficient de proportionnalité. De plus, il aurait été intéressant de pouvoir automatiser ces requêtes entre la stm32 et la rapsberry afin de supprimer toute intervention humaine dans la chaîne.
+Si nous avions eu plus de temps, nous aurions réalisé la même procédure pour l'obtention de la pression et pour le réglage du coefficient de proportionnalité. De plus, il aurait été intéressant de pouvoir automatiser ces requêtes entre la stm32 et la rapsberry afin de supprimer toute intervention humaine dans la chaîne de communication.
 
 
 
