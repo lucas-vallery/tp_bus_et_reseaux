@@ -508,39 +508,6 @@ def api_welcome_post():
         return welcome + "\r\n"
 ```
 Lorsque l'on a supprimé la chaîne, on la recréé grâce à la méthode POST. Si la requête est un POST, alors welcome prend comme valeur la chaîne que l'on écrite en donnée.
-
-### Réponse d'une requette GET
-```
- "args": {},
-  "headers": {
-    "Accept": "*/*",
-    "Host": "192.168.88.239:5000",
-    "User-Agent": "curl/7.74.0"
-  },
-  "method": "GET",
-  "path": null,
-  "url": "http://192.168.88.239:5000/api/request"
-```
-
-### Réponse d'une requette post 
-```
-"POST": {
-    "data": {
-      "Name": "Lucas"
-    }
-  },
-  "args": {},
-  "headers": {
-    "Accept": "*/*",
-    "Content-Length": "18",
-    "Content-Type": "application/json",
-    "Host": "192.168.88.239:5000",
-    "User-Agent": "curl/7.74.0"
-  },
-  "method": "POST",
-  "path": null,
-  "url": "http://192.168.88.239:5000/api/request"
-  ```
   
   ## TP4 - Bus CAN
   
