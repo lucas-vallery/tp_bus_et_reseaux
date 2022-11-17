@@ -648,7 +648,7 @@ La commande en angle est calculée à partir de la multiplication du coefficient
 }
 ```
   
-  ### API CRUD
+  ### API REST
   
   Nous avons implémenté l'API suivante : 
 
@@ -777,7 +777,16 @@ def postTemp():
 ![Communication entre la stm32 et la raspberry](images/finalcut.png)
 
 
+## Conclusion
 
+Durant ces 5 séances de TPs, nous avons réussi à : 
+- récupérer les données du capteur de température et de pression
+- récupérer les données sur le Raspberry par l'intermédiaire de notre shell
+- piloter le moteur pas à pas avec le bus CAN
+- créer une API REST pour stocker les valeurs
+
+Enfin, nous avons réussi à faire fonctionner tous ces modules ensemble. On a réalisé une requête avec la raspberry qui a demandé à la stm32 et donc au capteur la valeur de la température. Le microprocesseur renvoie la valeur de la température et l'API la stocke dans un tableau. 
+Si nous avions eu plus de temps, nous aurions réalisé la même procédure pour l'obtention de la pression et pour le réglage du coefficient de proportionnalité. De plus, il aurait été intéressant de pouvoir automatiser ces requêtes entre la stm32 et la rapsberry afin de supprimer toute intervention humaine dans la chaîne.
 
 
 
