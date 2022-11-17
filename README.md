@@ -692,17 +692,6 @@ def deleteTempIndex(index):
 Concernant le coefficient de proportionnalité K et l'angle, nous avons décidé de le fixer arbitrairement afin de réaliser nos tests dessus.
 Nous aborderons uniquement le cas de l'angle afin d'éviter les redondances.
 
-- GET 
-
-```python
-@app.route('/scale/', methods = ['GET'])
-def getScale():
-    constante = {"Coefficient de proportionnalite K" : K}
-    return jsonify(constante)
-```
-
-![Obtenir le coefficient de proportionnalité](images/getScale.png)
-
 - POST
 
 ```python
@@ -716,6 +705,18 @@ def postScale(value):
 ```
 
 ![Modifier la valeur de K](images/scale.png)
+
+- GET 
+
+```python
+@app.route('/scale/', methods = ['GET'])
+def getScale():
+    constante = {"Coefficient de proportionnalite K" : K}
+    return jsonify(constante)
+```
+
+![Obtenir le coefficient de proportionnalité](images/getScale.png)
+
 
 Enfin, nous avons eu le temps de traiter la communication entre la stm32 et la raspberry. Cependant, uniquement pour le cas où cette dernière demande une température au stm32. 
 Pour cela, nous avons dû importer le module serial et déclarer notre liaison uart avec un timeout. Ce timeout ....
