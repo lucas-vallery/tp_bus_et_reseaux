@@ -20,22 +20,42 @@ Ces différents TPs nous ont permis de réaliser :
 
 ![Schema introductif des TPs](images/presentation.png)
 
+## Configuration du microcontrôleur 
+
+Dans cette partie nous détaillerons la configuration du microcontrôleur utilisée tout au long du projet.
+### Horloge
+L'horloge (HCLK) du microcontrôleur provient du HSE et est configurée à 80 Mhz. Les autres paramètres concernant la configuration des horloges sont inchangés.
+
+### Bus I2C
+Le bus I2C utilisé est le bus I2C 2. Nous utilisons la broche PB10 pour le signal d'horloge (SCL) et PC12 pour les données (SDA). Tous les paramètres sont les paramètres par défaut et aucune interruption n'est autorisée.
+
+### Communications série
+* L'USART 1 est utilisée pour communiquer avec le Raspberry Pi à 115200 bit/s. Les interruptions sont autorisées. Les broches utilisées sont PA9(TX) et PA10(RX).
+* L'USART 2 est utilisée pour communiquer avec l'ordinateur à 115200 bit/s. Le printf y est redirigé. Les broches utilisées sont PA2(TX) et PA3(RX).
+
+### Communication CAN
+Nous utilisons l'interface CAN 1 du microcontrôleur sur les broches PB8(CAN RX) et PB9(CAN TX). La configuration de cette interface est la suivante :
+* Prescaler (for time Quantum)			16
+* Time Quante in bit segment 1			2 times
+* Time Quanta in bit segment 2			2 times
+* Baud rate					500 kbit/s
+
+Les autres paramètres sont inchangés.
 
 ## TP1 - Bus I2C
 
 Dans ce premier TP nous cherchons à mettre en place une communication I²C entre entre le microcontrôleur et deux composants I²C. Le microncontrôleur STM32 joue le rôle de maître sur le bus.
 
 ### Capteur BMP280
-La capteur BMP280 est un capteur de température est de pression. Ces deux grandeurs sont mesurées par deux composants I²C distincts.
+La capteur BMP280 est un capteur de température et de pression. Ces deux grandeurs sont mesurées par deux composants I²C distincts.
 
 ### Librairie pour le BMP280
 
-On a divisé cette librairie en deux fichiers : BMP280.c et BMP280.h
-Le premier fichier est celui dans lequel nous avons écrit notre code nécessaire à la communication I²C tandis que dans le second nous avons placé l'adresse I²C du capteur, les valeurs des registres et les prototypes des fonctions.
+Nous avons divisé cette librairie en deux fichiers : BMP280.c et BMP280.h
 
 __1. Identification du BMP280__
 
-Le principe de cette fonction est d'envoyer l'adresse du registre ID et de recevoir un octet contenant l'identifiant du capteur.
+La fonction suivante permet de tester la communication I2C en envoyant l'adresse du registre ID et en lisant le contenu de celui ci. De plus, nous connaissons à l'avance la valeure contenue dans le registre ID (d'après la documentation) et donc nous sommes à priori en mesure de verifier le bon fonctionnement de la communication.
 
 ```c
 uint8_t BMP280_getId(){
@@ -51,7 +71,11 @@ uint8_t BMP280_getId(){
 ```
 __2. Configuration du BMP280__
 
-
+Pour configurer le BMP280 en "mode normal", nous devons envoyer deux octets. Le premier contenant l'adresse du registre à modifier ici CTRL_MEAS et le second contenant la valeur que l'on veut écrire. On créé un tableau de 2 éléments contenant ces octects et nous les envoyons à l'aide de la fonction HAL_I2C_Master_Transmit.<br/>
+Nous venons ensuite lire la valeur contenue dans le registre que nous venons de modifier afin de vérifier que le processus d'écritur s'est correctement déroulé. La foncion BMP280_config effectue les actions décrites précédemment.
+<br/>
+Nous noterons une particularité de l'I2C. En effet, pour lire un registre, il faut d'abord écrire sur le bus l'adresse du registre que nous voulons lire afin de positionner la "tête de lecture" et enfin lire la valeur sur le bus à l'aide de HAL_I2C_Master_Receive.<br/>
+En revanche, l'écriture se fait en transmettant l'adresse du registre ou l'on veut écrire puis la valeur que l'on veut y mettre.
 
 ```c
 uint8_t BMP280_config(){
@@ -71,11 +95,11 @@ uint8_t BMP280_config(){
 	return ctrl_meas_rx_value;
 }
 ```
-Pour configurer le BMP280, on envoie deux octets. Le premier contenant l'adresse du registre à modifier ici CTRL_MEAS et le second la valeur que l'on veut écrire. On créé un tableau de 2 éléments prenant ces deux paramètres et on les envoie à l'aide de la fonction HAL.<br/>
-On a de plus ajouté la possibilité pour l'utilisateur de contrôler si la valeur a bien été écrite en la retournant.
+
 
 __3.Récupération de l'étalonnage__
 
+Avec cette fonction nous récupèrons les données d'étalonnage du capteur BMP280. Ces données vont nous permettre de calculer la température et la pression compensées. Nous recevons les 26 octets de l'étalonnage bien que nous ne les utiliserons pas tous dans la suite.<br/>
 ```c
 uint8_t BMP280_Etalonnage(uint8_t* calibration){
 	uint8_t etalonnage_register = (uint8_t)CALIB_TEMP_START;
@@ -89,7 +113,6 @@ uint8_t BMP280_Etalonnage(uint8_t* calibration){
 	return 0;
 }
 ```
-Avec cette fonction on récupère les données d'étalonnage du capteur BMP280. Ces données vont nous permettre de calculer la température et la pression compensées. On reçoit les 26 octets de l'étalonnage. Ceci n'est utile qu'ici car pas tout les octets ne servent pour calculer la température ou la pression.<br/>
 
 __4.Récupération de la température compensée__
 
