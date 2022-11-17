@@ -72,7 +72,7 @@ uint8_t BMP280_getId(){
 ```
 __2. Configuration du BMP280__
 
-Pour configurer le BMP280 en "mode normal", nous devons envoyer deux octets. Le premier contenant l'adresse du registre à modifier ici CTRL_MEAS et le second contenant la valeur que l'on veut écrire. On créé un tableau de 2 éléments contenant ces octects et nous les envoyons à l'aide de la fonction HAL_I2C_Master_Transmit.<br/>
+Pour configurer le BMP280 en "mode normal", nous devons envoyer deux octets. Le premier contenant l'adresse du registre à modifier ici CTRL_MEAS et le second contenant la valeur que l'on veut écrire. On créé un tableau de 2 éléments contenant ces octets et nous les envoyons à l'aide de la fonction HAL_I2C_Master_Transmit.<br/>
 Nous venons ensuite lire la valeur contenue dans le registre que nous venons de modifier afin de vérifier que le processus d'écriture s'est correctement déroulé. La foncion BMP280_config effectue les actions décrites précédemment.
 <br/>
 Nous noterons une particularité de l'I2C. En effet, pour lire un registre, il faut d'abord écrire sur le bus l'adresse du registre que nous voulons lire afin de positionner la "tête de lecture" et enfin lire la valeur sur le bus à l'aide de HAL_I2C_Master_Receive.<br/>
