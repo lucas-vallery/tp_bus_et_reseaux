@@ -648,7 +648,7 @@ La commande en angle est calculée à partir de la multiplication du coefficient
 }
 ```
   
-  ### API REST
+  ### API CRUD
   
   Nous avons implémenté l'API suivante : 
 
