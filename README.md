@@ -405,7 +405,7 @@ L'objectif étant d'avoir une réponse qui remplisse les champs args et data.
 Pour cela, on va utiliser la ligne de commande suivante : 
 
 ```
-curl -X POST -H 'Content-Type: application/json' http://192.168.88.214:5000/api/request/ -d '{"name": "Lucas"}'
+curl -X POST -H 'Content-Type: application/json' http://192.168.88.239:5000/api/request/ -d '{"name": "Lucas"}'
 ```
 Voici la réponse sur la console : 
 
