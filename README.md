@@ -3,7 +3,7 @@ _# Tp bus et réseaux – Castellani Vallery
 ## Table des matières
 
 - [Introduction](#introduction)
-- [Configuration du microcontrôleur](#Configuration---du---microcontrôleur)
+- [Configuration du microcontrôleur](#Configuration-du-microcontrôleur)
 - [TP1 - Bus I2C](#TP1---bus-i2c)
 - [TP2 - Interfaçage STM32 - Raspberry](#tp2---interfaçage-stm32---raspberry)
 - [TP3 - Interface REST](#TP3---interface-REST)
