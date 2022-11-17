@@ -633,15 +633,29 @@ La commande en angle est calculée à partir de la multiplication du coefficient
 
 Nous avons dans un premier temps réalisé cet API avec un tableau de températures défini :
 
-```c
+```python
 temp = [0,0,25,0]
 ```
+- GET
 
-![Ajouter une température](images/postTemp.png)
+```python
+@app.route('/temp/', methods=['GET'])
+def getTemp():
+        list = []
+        for index in range(len(temp)):
+                list.append({"index":index, "val": temp[index]})
+        total = {"all": list}
+        return jsonify(total)
+```
+
+![Tableau des températures](images/getAllTemp.png)
+
+
+- POST
 
 ```python
 @app.route('/temp/', methods=['POST'])
-def temp_post(path = '/temp/'):
+def postTemp(path = '/temp/'):
         resp = {
                "method": request.method,
                "url" :  request.url,
@@ -658,15 +672,75 @@ def temp_post(path = '/temp/'):
         return jsonify(resp)
 ```
 
-![Modifier la valeur de K](images/scale.png)
+![Ajouter une température](images/postTemp.png)
 
-![Obtenir le coefficient de proportionnalité](images/getScale.png)
+- DELETE
+
+```python
+@app.route('/temp/<int:index>', methods = ['DELETE'])
+def deleteTempIndex(index):
+    if (index > len(temp)):
+        abort(404)
+    else : 
+        temp.pop(index)
+        return "The data is deleted\r\n"
+```
 
 ![Supprimer une température](images/deleteTemp.png)
 
+
+Concernant le coefficient de proportionnalité K et l'angle, nous avons décidé de le fixer arbitrairement afin de réaliser nos tests dessus.
+Nous aborderons uniquement le cas de l'angle afin d'éviter les redondances.
+
+- GET 
+
+```python
+@app.route('/scale/', methods = ['GET'])
+def getScale():
+    constante = {"Coefficient de proportionnalite K" : K}
+    return jsonify(constante)
+```
+
+![Obtenir le coefficient de proportionnalité](images/getScale.png)
+
+- POST
+
+```python
+@app.route('/scale/<int:value>', methods = ['POST'])
+def postScale(value):
+    global K
+    if request.method == 'POST':
+        K  = value
+    return jsonify({"Coeff" : K})
+
+```
+
+![Modifier la valeur de K](images/scale.png)
+
+Enfin, nous avons eu le temps de traiter la communication entre la stm32 et la raspberry. Cependant, uniquement pour le cas où cette dernière demande une température au stm32. 
+Pour cela, nous avons dû importer le module serial et déclarer notre liaison uart avec un timeout. Ce timeout ....
+
+```python
+import serial
+uart = serial.Serial('/dev/ttyAMA0', 115200, timeout=1)
+```
+Mais aussi modifier la fonction précédemment écrite pour obtenir une température. Nous avons décidé de faire une fonction commune pour la méthode GET et POST.
+
+```python
+@app.route('/temp/', methods = ['POST', 'GET'])
+def postTemp():
+    uart.write(b"GET_T\r")
+    temperature = (uart.readline().strip()).decode('ascii')
+    temperature = float(temperature)
+    temp.append(temperature)
+    if request.method == 'POST':
+        return "", 202
+    return jsonify({"Valeurs temperature" : temperature})
+```
+
 ![Communication entre la stm32 et la raspberry](images/finalcut.png)
 
-![Tableau des températures](images/getAllTemp.png)
+
 
 
 
