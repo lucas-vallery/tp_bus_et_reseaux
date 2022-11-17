@@ -721,7 +721,7 @@ def getScale():
 ![Obtenir le coefficient de proportionnalité](images/getScale.png)
 
 
-Enfin, nous avons eu le temps de traiter la communication entre la stm32 et la raspberry. Cependant, uniquement pour le cas où cette dernière demande une température au stm32. 
+Enfin, nous avons eu le temps de traiter la communication entre la STM32 et le Raspberry Pi. Cependant, uniquement pour le cas où cette dernière demande une température au stm32. 
 Pour cela, nous avons dû importer le module serial et déclarer notre liaison uart avec un timeout. Ce timeout ....
 
 ```python
@@ -753,8 +753,8 @@ Durant ces 5 séances de TPs, nous avons réussi à :
 - Piloter le moteur pas à pas avec le bus CAN
 - Créer une API REST pour stocker les valeurs
 
-Enfin, nous avons réussi à faire fonctionner tous ces modules ensemble. On a réalisé une requête avec la raspberry qui a demandé à la stm32 et donc au capteur la valeur de la température. Le microprocesseur renvoie la valeur de la température et l'API la stocke dans un tableau. 
-Si nous avions eu plus de temps, nous aurions réalisé la même procédure pour l'obtention de la pression et pour le réglage du coefficient de proportionnalité. De plus, il aurait été intéressant de pouvoir automatiser ces requêtes entre la stm32 et la rapsberry afin de supprimer toute intervention humaine dans la chaîne de communication.
+Enfin, nous avons réussi à faire fonctionner tous ces modules ensemble. On a réalisé une requête avec la Raspberry Pi qui a demandé à la STM32 et donc au capteur la valeur de la température. Le microprocesseur renvoie la valeur de la température et l'API la stocke dans un tableau. 
+Si nous avions eu plus de temps, nous aurions réalisé la même procédure pour l'obtention de la pression et pour le réglage du coefficient de proportionnalité. De plus, il aurait été intéressant de pouvoir automatiser ces requêtes entre la STM32 et la Rapsberry Pi afin de supprimer toute intervention humaine dans la chaîne de communication.
 
 
 
