@@ -13,34 +13,12 @@ _# Tp bus et réseaux – Castellani Vallery
 ## Introduction
 
 Ces différents TPs nous ont permis de réaliser : 
-- Une liaison I²C entre la STM32 et un capteur de pression et de température
+- Une liaison I²C entre la STM32 Nucleo et un capteur de pression et de température
 - Une liaison UART entre la STM32 et un Raspberry Pi
 - Une interface Web sur le Raspberry Pi
 - Une liaison CAN entre la STM32 et une carte pilotant un moteur pas à pas
 
 ![Schema introductif des TPs](images/presentation.png)
-
-## Configuration du microcontrôleur 
-
-Dans cette partie nous détaillerons la configuration du microcontrôleur utilisée tout au long du projet.
-### Horloge
-L'horloge (HCLK) du microcontrôleur provient du HSE et est configurée à 80 Mhz. Les autres paramètres concernant la configuration des horloges sont inchangés.
-
-### Bus I2C
-Le bus I2C utilisé est le bus I2C 2. Nous utilisons la broche PB10 pour le signal d'horloge (SCL) et PC12 pour les données (SDA). Tous les paramètres sont les paramètres par défaut et aucune interruption n'est autorisée.
-
-### Communications série
-* L'USART 1 est utilisée pour communiquer avec le Raspberry Pi à 115200 bit/s. Les interruptions sont autorisées. Les broches utilisées sont PA9(TX) et PA10(RX).
-* L'USART 2 est utilisée pour communiquer avec l'ordinateur à 115200 bit/s. Le printf y est redirigé. Les broches utilisées sont PA2(TX) et PA3(RX).
-
-### Communication CAN
-Nous utilisons l'interface CAN 1 du microcontrôleur sur les broches PB8(CAN RX) et PB9(CAN TX). La configuration de cette interface est la suivante :
-* Prescaler (for time Quantum)			16
-* Time Quante in bit segment 1			2 times
-* Time Quanta in bit segment 2			2 times
-* Baud rate					500 kbit/s
-
-Les autres paramètres sont inchangés.
 
 
 ## TP1 - Bus I2C
@@ -48,16 +26,16 @@ Les autres paramètres sont inchangés.
 Dans ce premier TP nous cherchons à mettre en place une communication I²C entre entre le microcontrôleur et deux composants I²C. Le microncontrôleur STM32 joue le rôle de maître sur le bus.
 
 ### Capteur BMP280
-La capteur BMP280 est un capteur de température et de pression. Ces deux grandeurs sont mesurées par deux composants I²C distincts.
+La capteur BMP280 est un capteur de température est de pression. Ces deux grandeurs sont mesurées par deux composants I²C distincts.
 
 ### Librairie pour le BMP280
 
-Nous avons divisé cette librairie en deux fichiers : BMP280.c et BMP280.h
+On a divisé cette librairie en deux fichiers : BMP280.c et BMP280.h
 Le premier fichier est celui dans lequel nous avons écrit notre code nécessaire à la communication I²C tandis que dans le second nous avons placé l'adresse I²C du capteur, les valeurs des registres et les prototypes des fonctions.
 
 __1. Identification du BMP280__
 
-Cette fonction permet de tester la communication entre la STM32 et le BMP280. Nous envoyons l'adresse du registre contenant l'ID et nous recevons, de la part du capteur, l'octet correspondant.
+Le principe de cette fonction est d'envoyer l'adresse du registre ID et de recevoir un octet contenant l'identifiant du capteur.
 
 ```c
 uint8_t BMP280_getId(){
@@ -609,7 +587,31 @@ Enfin, on envoie notre trame à l'aide de la fonction HAL : HAL_CAN_AddTxMessage
   
   ### Commande du moteur pas à pas en fonction du capteur de température avec le STM32
   
+  Tout d'abord, nous devons configurer notre capteur de température, notre shell et notre stepper.
   
+  ```c
+uint8_t id = BMP280_getId();
+printf("id : 0x%x\r\n", id);
+uint8_t bmp280_config = BMP280_config();
+printf("config : 0x%x\r\n", bmp280_config);
+
+stepper_CanInit(&stepper, &hcan1);
+stepper_set0(&stepper);
+stepper_setK(&stepper, 1);
+  ```
+La commande en angle est calculée à partir de la multiplication du coefficient K avec la différence entre la nouvelle température mesurée et la température de la précédente exécution. Le sens de rotation est ensuite défini en fonction du résultat précédent et l'ordre est envoyé avec la fonction stepper_writeAngle() écrite dans le TP précédent.
+ 
+  ```c
+  void stepper_displayTemp(stepper_t* stepper, float temp, float zeroOffset){
+	uint16_t k = stepper->K;
+	uint16_t sign = 0x00;
+	float angle = k*(temp-zeroOffset);
+
+	sign = (angle < 0) ? 0x00 : 0x01;
+
+	stepper_writeAngle(stepper, (uint8_t)(abs(angle)), sign);
+}
+```
   
   ### API REST
   
@@ -629,7 +631,32 @@ Enfin, on envoie notre trame à l'aide de la fonction HAL : HAL_CAN_AddTxMessage
 | Delete | DELETE | temp/x | Delete temperature #x |
 | Delete | DELETE | pres/x | Delete pressure #x |
 
+Nous avons dans un premier temps réalisé cet API avec un tableau de températures défini :
+
+```c
+temp = [0,0,25,0]
+```
+
 ![Ajouter une température](images/postTemp.png)
+
+```python
+@app.route('/temp/', methods=['POST'])
+def temp_post(path = '/temp/'):
+        resp = {
+               "method": request.method,
+               "url" :  request.url,
+               "path" : path,
+               "args": request.args,
+               "headers": dict(request.headers),
+        }
+        if request.method == 'POST':
+                resp["POST"] = {
+                        "data" : request.get_json(),
+                }
+                json = request.get_json()
+                temp.append(json["temp"])
+        return jsonify(resp)
+```
 
 ![Modifier la valeur de K](images/scale.png)
 
