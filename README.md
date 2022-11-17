@@ -114,36 +114,24 @@ uint8_t BMP280_Etalonnage(uint8_t* calibration){
 }
 ```
 
-__4.Récupération de la température compensée__
+__4.Récupération de la température et de la température compensée__
 
-Voici ci-dessous les deux fonctions nous permettant d'obtenir une valeur de température compensée : 
+La fonction ci dessous permet de récupérer les données de température sur 3 octets. Les données sont remise en forme afin d'obtenir une valeur exploitable.
 
 ```c
-float BMP280_readRawTemp(){
+uint32_t BMP280_readRawTemp(){
 	uint8_t temp_msb_register = (uint8_t)TEMP_MSB;
-	uint8_t temp_frame_rx[3];
+	uint8_t temp_frame_rx[3] = {0};
 
-	if(HAL_OK == HAL_I2C_Master_Transmit(&hi2c1, BMP_I2C_ADD, &temp_msb_register, 1, HAL_MAX_DELAY)){
-		if(HAL_OK == HAL_I2C_Master_Receive(&hi2c1, BMP_I2C_ADD, temp_frame_rx, 3, HAL_MAX_DELAY)){
-
-		}
-	}
-
-	uint32_t rawTemp = (temp_frame_rx[0]<<12) + (temp_frame_rx[1]<<4) + (temp_frame_rx[2]>>4);
-
-	uint8_t tempArray[6] = {0};
-	temp_msb_register = (uint8_t)CALIB_TEMP_START;
-
-	if(HAL_OK == HAL_I2C_Master_Transmit(&hi2c1, BMP_I2C_ADD, &temp_msb_register, 1, HAL_MAX_DELAY)){
-		if(HAL_OK == HAL_I2C_Master_Receive(&hi2c1, BMP_I2C_ADD, tempArray, 6, HAL_MAX_DELAY)){
+	if(HAL_OK == HAL_I2C_Master_Transmit(&hi2c2, BMP_I2C_ADD, &temp_msb_register, 1, HAL_MAX_DELAY)){
+		if(HAL_OK == HAL_I2C_Master_Receive(&hi2c2, BMP_I2C_ADD, temp_frame_rx, 3, HAL_MAX_DELAY)){
 
 		}
 	}
-
-	return (float)BMP280_compensateTemp(tempArray, rawTemp)/100;
+	return (temp_frame_rx[0]<<12) | (temp_frame_rx[1]<<4) | (temp_frame_rx[2]>>4);
 }
 ```
-Cette fonction est divisée en quatre partie. Tout d'abord, on récupère des données du capteur sur 3 octets. Puis, on remet ces données en ordre afin d'obtenir une valeur de température non compensée. Dans la troisième partie, on récupère les 6 octets d'etalonnage que l'on va utiliser pour calculer la température compensée. Enfin, on appelle la fonction ci-dessous (fournie dans la documentation du BMP280 pour calculer cette valeur.
+Dans cette seconde fonction, nous récupèrons les 6 octets d'etalonnage que nous allons utiliser pour calculer la température compensée. Enfin, nous appelons la fonction ci-dessous (fournie dans la documentation du BMP280 pour calculer cette valeur).
 
 ```c
 uint32_t BMP280_compensateTemp(uint8_t *calib, uint32_t rawTemp){
@@ -162,35 +150,41 @@ uint32_t BMP280_compensateTemp(uint8_t *calib, uint32_t rawTemp){
 	return (t_fine * 5 + 128) >> 8;
 }
 ```
+Enfin, nous appliquons cette compensation à la température brute avec la fonction suivante et nous retournons la température compensée en dégrés.
+```c
+float BMP280_readCompensateTemp(){
+	uint8_t temp_msb_register = (uint8_t)TEMP_MSB;
+	uint32_t rawTemp = BMP280_readRawTemp();
+
+	uint8_t tempArray[6] = {0};
+	temp_msb_register = (uint8_t)CALIB_TEMP_START;
+
+	if(HAL_OK == HAL_I2C_Master_Transmit(&hi2c2, BMP_I2C_ADD, &temp_msb_register, 1, HAL_MAX_DELAY)){
+		if(HAL_OK == HAL_I2C_Master_Receive(&hi2c2, BMP_I2C_ADD, tempArray, 6, HAL_MAX_DELAY)){
+
+		}
+	}
+	return (float)BMP280_compensateTemp(tempArray, rawTemp)/100;
+}
+```
+
 
 __5.Récupération de la pression compensée__
 
-Même principe pour obtenir la pression compensée sauf qu'il faut récupérer dans ce cas les 18 octets d'étalonnage : 
+Même principe pour obtenir la pression compensée sauf qu'il faut récupérer dans ce cas les 18 octets d'étalonnage. Ces fonctions s'en occupent :
 
 ```c
-float BMP280_readRawPress(){
+uint32_t BMP280_readRawPress(){
+	uint8_t press_frame_rx[3] = {0};
 	uint8_t press_msb_register = (uint8_t)PRESS_MSB;
-	uint8_t press_frame_rx[3];
 
-	if(HAL_OK == HAL_I2C_Master_Transmit(&hi2c1, BMP_I2C_ADD, &press_msb_register, 1, HAL_MAX_DELAY)){
-		if(HAL_OK == HAL_I2C_Master_Receive(&hi2c1, BMP_I2C_ADD, press_frame_rx, 3, HAL_MAX_DELAY)){
-
-		}
-	}
-
-	uint32_t rawPress = (press_frame_rx[0]<<12) + (press_frame_rx[1]<<4) + (press_frame_rx[2]>>4);
-
-	uint8_t pressArray[18] = {0};
-	press_msb_register = (uint8_t)CALIB_PRESS_START;
-
-	if(HAL_OK == HAL_I2C_Master_Transmit(&hi2c1, BMP_I2C_ADD, &press_msb_register, 1, HAL_MAX_DELAY)){
-		if(HAL_OK == HAL_I2C_Master_Receive(&hi2c1, BMP_I2C_ADD, pressArray, 18, HAL_MAX_DELAY)){
+	if(HAL_OK == HAL_I2C_Master_Transmit(&hi2c2, BMP_I2C_ADD, &press_msb_register, 1, HAL_MAX_DELAY)){
+		if(HAL_OK == HAL_I2C_Master_Receive(&hi2c2, BMP_I2C_ADD, press_frame_rx, 3, HAL_MAX_DELAY)){
 
 		}
 	}
 
-
-	return BMP280_compensatePress(pressArray, rawPress)/256;
+	return (press_frame_rx[0]<<12) | (press_frame_rx[1]<<4) | (press_frame_rx[2]>>4);
 }
 ```
 
@@ -224,6 +218,24 @@ uint32_t BMP280_compensatePress(uint8_t *calib, uint32_t rawPress) {
 	var2 = (((uint64_t)dig_P8) * p) >> 19;
 	p = ((p + var1 + var2) >> 8) + (((uint64_t)dig_P7)<<4);
 	return (uint32_t)p;
+}
+```
+
+```c
+float BMP280_readCompensatePress(){
+	uint8_t press_msb_register = (uint8_t)PRESS_MSB;
+	uint32_t rawPress = BMP280_readRawPress();
+
+	uint8_t pressArray[18] = {0};
+	press_msb_register = (uint8_t)CALIB_PRESS_START;
+
+	if(HAL_OK == HAL_I2C_Master_Transmit(&hi2c2, BMP_I2C_ADD, &press_msb_register, 1, HAL_MAX_DELAY)){
+		if(HAL_OK == HAL_I2C_Master_Receive(&hi2c2, BMP_I2C_ADD, pressArray, 6, HAL_MAX_DELAY)){
+
+		}
+	}
+
+	return BMP280_compensatePress(pressArray, rawPress)/256.0;
 }
 ```
 ## TP2 - Interfaçage STM32 - Raspberry
