@@ -576,20 +576,20 @@ uint8_t stepper_CanInit(stepper_t* stepper, CAN_HandleTypeDef * hcan){
 
  __2. Commande d'angle et de vitesse__
  
-Pour transmettre un ordre en rotation et en vitesse, nous avons dévéloppé la fonction stepper_WriteAngleSpeed().
+Pour transmettre un ordre en rotation, nous avons dévéloppé la fonction stepper_WriteAngle().
 
 ```c
 void stepper_WriteAngleSpeed(stepper_t* stepper, uint8_t angle, uint8_t sign, uint8_t speed){
 	CAN_TxHeaderTypeDef pHeader;
 
-	pHeader.StdId = 0x60;
+	pHeader.StdId = 0x61;
 	pHeader.ExtId = 0;
 	pHeader.IDE = CAN_ID_STD;
 	pHeader.RTR = CAN_RTR_DATA;
 	pHeader.DLC = 3;
 	pHeader.TransmitGlobalTime = DISABLE;
 
-	uint8_t aData[3] = {angle, sign, speed};
+	uint8_t aData[2] = {angle, sign};
 
 	if(HAL_CAN_AddTxMessage(stepper->canHandler, &pHeader, (uint8_t*)&aData, &pTxMailBox) != HAL_OK){
 		Error_Handler();
@@ -607,14 +607,14 @@ Nous avons développé cela grâce à la documentation du moteur pas à pas.
   
 Cette fonction prend en paramètres la structure, l'angle de rotation, le signe de la rotation et la vitesse de rotation. 
 Il faut dans un premier temps construire le header de la trame : 
-- StdId : message Id lorsque celui-ci est dans le mode standard, Ox62 pour la commande en angle et vitesse
+- StdId : message Id lorsque celui-ci est dans le mode standard, Ox61 pour la commande en angle
 - ExtId : message Id lorsque l'on est en mode étendu. Il est donc nul car on est en mode standard.
 - IDE : définit si la trame est standard (CAN_ID_STD) ou étendue (CAN_ID_EXT).
 - RTR : définit si la trame est du type standard (CAN_RTR_DATA) ou RTR (CAN_RTR_REMOTE).
 - DLC : entier représentant la taille des données à transmettre.
 - TransmitGlobalTime : dispositif permettant de mesurer les temps de réponse du bus CAN. Le fixer à DISABLE.
 
-Dans la seconde partie de la fonction, on construit un tableau de 3 éléments comprenant l'angle, le sens et la vitesse de rotation. 
+Dans la seconde partie de la fonction, on construit un tableau de 2 éléments comprenant l'angle et le sens de rotation. 
 Enfin, on envoie notre trame à l'aide de la fonction HAL : HAL_CAN_AddTxMessage().
 
 
