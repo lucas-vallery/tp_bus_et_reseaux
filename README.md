@@ -722,7 +722,7 @@ def getScale():
 
 
 Enfin, nous avons eu le temps de traiter la communication entre la STM32 et le Raspberry Pi. Cependant, uniquement pour le cas où cette dernière demande une température au stm32. 
-Pour cela, nous avons dû importer le module serial et déclarer notre liaison uart avec un timeout. Ce timeout ....
+Pour cela, nous avons dû importer le module serial et déclarer notre liaison uart avec un timeout. Nous noterons que sans ce timeout, le serveur flask ne démarre pas.
 
 ```python
 import serial
